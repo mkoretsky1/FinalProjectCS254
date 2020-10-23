@@ -1,4 +1,4 @@
-""" CS 254 - Final Project - Data Cleaning/Exploration """
+""" CS 254 - Final Project - Data Cleaning """
 
 ### Imports ###
 import pandas as pd
@@ -20,10 +20,11 @@ nypd = pd.read_csv('nypd_data/NYPD_Complaint_Data_Historic_10000_subsamples.csv'
 # PD_CD and PD_DESC too granular to make one-hot variables with
 drop = ['Unnamed: 0', 'CMPLNT_TO_DT', 'CMPLNT_TO_TM', 'PARKS_NM', 'HADEVELOPT', 'HOUSING_PSA', 
          'TRANSIT_DISTRICT', 'STATION_NAME', 'JURIS_DESC', 'JURISDICTION_CODE', 'RPT_DT', 'PATROL_BORO',
-         'X_COORD_CD', 'Y_COORD_CD', 'Lat_Lon', 'PD_CD', 'PD_DESC', 'KY_CD']
+         'X_COORD_CD', 'Y_COORD_CD', 'Lat_Lon', 'PD_CD', 'PD_DESC', 'KY_CD','ADDR_PCT_CD']
+nypd = nypd.drop(drop, axis=1)
 
 # Extracting each piece of datetime
-nypd = nypd.drop(drop, axis=1)
+nypd['CMPLNT_FR_DT'] = nypd.CMPLNT_FR_DT.replace({'1019':'2019', '1016':'2016', '1017':'2017'}, regex = True)
 nypd['year'] = pd.DatetimeIndex(nypd['CMPLNT_FR_DT']).year
 nypd['month'] = pd.DatetimeIndex(nypd['CMPLNT_FR_DT']).month
 nypd['day'] = pd.DatetimeIndex(nypd['CMPLNT_FR_DT']).day
@@ -42,7 +43,7 @@ nypd['SUSP_AGE_GROUP'] = nypd['SUSP_AGE_GROUP'].apply(age_groups)
 nypd['VIC_AGE_GROUP'] = nypd['VIC_AGE_GROUP'].apply(age_groups)
 
 # List of variables that need one-hot encoding
-one_hot = ['ADDR_PCT_CD','OFNS_DESC','LAW_CAT_CD','BORO_NM','LOC_OF_OCCUR_DESC','PREM_TYP_DESC','SUSP_AGE_GROUP','SUSP_RACE',
+one_hot = ['OFNS_DESC','LAW_CAT_CD','BORO_NM','LOC_OF_OCCUR_DESC','PREM_TYP_DESC','SUSP_AGE_GROUP','SUSP_RACE',
            'SUSP_SEX','VIC_AGE_GROUP','VIC_RACE','VIC_SEX']
 # Uncomment to check the unique values of each one-hot variable
 # for var in one_hot:
@@ -51,7 +52,7 @@ one_hot = ['ADDR_PCT_CD','OFNS_DESC','LAW_CAT_CD','BORO_NM','LOC_OF_OCCUR_DESC',
     
 # Creating dummy variables where applicable - ignoring nan for now (can make a column for them if we want)
 nypd = pd.get_dummies(nypd, columns=one_hot, 
-                      prefix=['precinct','off','law_cat','boro','loc','loc_type','susp_age','susp_race',
+                      prefix=['off','law_cat','boro','loc','loc_type','susp_age','susp_race',
                               'susp_sex','vic_age','vic_race','vic_sex'])
 # Output to csv
 nypd.to_csv('nypd_data/nypd_10000.csv')
