@@ -42,7 +42,7 @@ nypd = nypd.drop(['CMPLNT_FR_DT','CMPLNT_FR_TM','CRM_ATPT_CPTD_CD'], axis=1)
 nypd['SUSP_AGE_GROUP'] = nypd['SUSP_AGE_GROUP'].apply(age_groups)
 nypd['VIC_AGE_GROUP'] = nypd['VIC_AGE_GROUP'].apply(age_groups)
 
-# List of variables that need one-hot encoding
+# List of variables that need one-hot encoding - might want to add year, month to this
 one_hot = ['OFNS_DESC','LAW_CAT_CD','BORO_NM','LOC_OF_OCCUR_DESC','PREM_TYP_DESC','SUSP_AGE_GROUP','SUSP_RACE',
            'SUSP_SEX','VIC_AGE_GROUP','VIC_RACE','VIC_SEX']
 # Uncomment to check the unique values of each one-hot variable
@@ -54,6 +54,16 @@ one_hot = ['OFNS_DESC','LAW_CAT_CD','BORO_NM','LOC_OF_OCCUR_DESC','PREM_TYP_DESC
 nypd = pd.get_dummies(nypd, columns=one_hot, 
                       prefix=['off','law_cat','boro','loc','loc_type','susp_age','susp_race',
                               'susp_sex','vic_age','vic_race','vic_sex'])
+
+# Manually creating dummy variables for time of day and season
+nypd['season_winter'] = np.where(nypd['month'] == 12 | nypd['month'] <= 2, 1, 0)
+nypd['season_spring'] = np.where(2 < nypd['month'] <= 5, 1, 0)
+nypd['season_summer'] = np.where(5 < nypd['month'] <= 8, 1, 0)
+nypd['seaon_fall'] = np.where(8 < nypd['month'] <= 11, 1, 0)
+nypd['tod_morning'] = np.where(nypd['hour'] <= 12, 1, 0)
+nypd['tod_afternoon'] = np.where(12 <= nypd['hour'] <= 19, 1, 0)
+nypd['tod_night'] = np.where(nypd['hour'] > 19, 1, 0)
+
 # Output to csv
 nypd.to_csv('nypd_data/nypd_10000.csv')
 
