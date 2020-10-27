@@ -11,6 +11,24 @@ def age_groups(age):
     else:
         return 'UNKNOWN'
     
+def tod_groups(hour):
+    if hour < 12:
+        return 'morning'
+    elif 12 <= hour <= 19:
+        return 'afternoon'
+    else:
+        return'night'
+        
+def season_groups(month):
+    if month == 12 or month <= 2:
+        return 'winter'
+    elif 2 < month <= 5:
+        return 'spring'
+    elif 5 <  month <= 8:
+        return 'summer'
+    else:
+        return 'fall'
+    
 ### Main ###
 nypd = pd.read_csv('nypd_data/NYPD_Complaint_Data_Historic_10000_subsamples.csv', 
                          parse_dates=['CMPLNT_FR_DT','CMPLNT_FR_TM'])
@@ -30,9 +48,8 @@ nypd['month'] = pd.DatetimeIndex(nypd['CMPLNT_FR_DT']).month
 nypd['day'] = pd.DatetimeIndex(nypd['CMPLNT_FR_DT']).day
 nypd['hour'] = pd.DatetimeIndex(nypd['CMPLNT_FR_TM']).hour
 nypd['minute'] = pd.DatetimeIndex(nypd['CMPLNT_FR_TM']).minute
-nypd['second'] = pd.DatetimeIndex(nypd['CMPLNT_FR_TM']).second
 # Creating new datetime object
-nypd['complaint_datetime'] = pd.to_datetime(nypd[['year','month','day','hour','minute','second']])
+nypd['complaint_datetime'] = pd.to_datetime(nypd[['year','month','day','hour','minute']])
 # Mapping attepted/completed to 0/1
 nypd['attempted_completed'] = nypd['CRM_ATPT_CPTD_CD'].map({'COMPLETED':1,'ATTEMPTED':0})
 # Dropping old datetime columns and attemped/completed
@@ -42,9 +59,18 @@ nypd = nypd.drop(['CMPLNT_FR_DT','CMPLNT_FR_TM','CRM_ATPT_CPTD_CD'], axis=1)
 nypd['SUSP_AGE_GROUP'] = nypd['SUSP_AGE_GROUP'].apply(age_groups)
 nypd['VIC_AGE_GROUP'] = nypd['VIC_AGE_GROUP'].apply(age_groups)
 
-# List of variables that need one-hot encoding
+# Creating categorical variables for time of day and season
+nypd['time_of_day'] = nypd['hour'].apply(tod_groups)
+nypd['season'] = nypd['month'].apply(season_groups)
+
+# Storing borough name, time of day, season to add back after dummy variable creation
+borough_name = nypd['BORO_NM'].values
+tod = nypd['time_of_day'].values
+season = nypd['season'].values
+
+# List of variables that need one-hot encoding - might want to add year, month to this
 one_hot = ['OFNS_DESC','LAW_CAT_CD','BORO_NM','LOC_OF_OCCUR_DESC','PREM_TYP_DESC','SUSP_AGE_GROUP','SUSP_RACE',
-           'SUSP_SEX','VIC_AGE_GROUP','VIC_RACE','VIC_SEX']
+           'SUSP_SEX','VIC_AGE_GROUP','VIC_RACE','VIC_SEX','time_of_day','season']
 # Uncomment to check the unique values of each one-hot variable
 # for var in one_hot:
 #     print(var)
@@ -53,7 +79,13 @@ one_hot = ['OFNS_DESC','LAW_CAT_CD','BORO_NM','LOC_OF_OCCUR_DESC','PREM_TYP_DESC
 # Creating dummy variables where applicable - ignoring nan for now (can make a column for them if we want)
 nypd = pd.get_dummies(nypd, columns=one_hot, 
                       prefix=['off','law_cat','boro','loc','loc_type','susp_age','susp_race',
-                              'susp_sex','vic_age','vic_race','vic_sex'])
+                              'susp_sex','vic_age','vic_race','vic_sex','tod','season'])
+
+# Adding borough name, time of day, season back in
+nypd['BORO_NM'] = borough_name
+nypd['time_of_day'] = tod
+nypd['season'] = season
+
 # Output to csv
 nypd.to_csv('nypd_data/nypd_10000.csv')
 
