@@ -25,11 +25,19 @@ nypd = nypd.dropna()
 print(len(nypd.columns))
 
 # Getting X data
-drop_always = ['CMPLNT_NUM','complaint_datetime','Latitude','Longitude']
-drop_1_vs_all = ['CMPLNT_NUM','complaint_datetime','boro_BRONX','boro_BROOKLYN','boro_MANHATTAN',
-        'boro_QUEENS','boro_STATEN ISLAND','Latitude','Longitude','BORO_NM']
-drop_multiclass = ['CMPLNT']
-X = nypd.drop(drop_always, axis=1)
+# Variables to drop regardless of the analysis
+drop_always = ['CMPLNT_NUM','complaint_datetime','BORO_NM','time_of_day','season','tod_afternoon',
+               'tod_morning','tod_night','season_fall','season_spring','season_summer','season_winter']
+# Variables to drop when performing classification for location
+drop_for_location_analysis = ['Latitude','Longitude','boro_BRONX','boro_BROOKLYN','boro_MANHATTAN',
+                              'boro_QUEENS','boro_STATEN ISLAND']
+# Variables to drop when performing classification for tod
+drop_for_tod_analysis = ['hour','minute']
+# Variables to drop when performing classification for season
+drop_for_season_analysis = ['month']
+# Creating one list of variables to drop - Edit this line based on analysis being performed
+drop = drop_always + drop_for_location_analysis
+X = nypd.drop(drop, axis=1)
 print(len(nypd.columns))
 
 # Response variable - starting with Manhattan

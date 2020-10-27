@@ -48,9 +48,8 @@ nypd['month'] = pd.DatetimeIndex(nypd['CMPLNT_FR_DT']).month
 nypd['day'] = pd.DatetimeIndex(nypd['CMPLNT_FR_DT']).day
 nypd['hour'] = pd.DatetimeIndex(nypd['CMPLNT_FR_TM']).hour
 nypd['minute'] = pd.DatetimeIndex(nypd['CMPLNT_FR_TM']).minute
-nypd['second'] = pd.DatetimeIndex(nypd['CMPLNT_FR_TM']).second
 # Creating new datetime object
-nypd['complaint_datetime'] = pd.to_datetime(nypd[['year','month','day','hour','minute','second']])
+nypd['complaint_datetime'] = pd.to_datetime(nypd[['year','month','day','hour','minute']])
 # Mapping attepted/completed to 0/1
 nypd['attempted_completed'] = nypd['CRM_ATPT_CPTD_CD'].map({'COMPLETED':1,'ATTEMPTED':0})
 # Dropping old datetime columns and attemped/completed
