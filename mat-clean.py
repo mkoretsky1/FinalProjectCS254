@@ -38,7 +38,7 @@ nypd = pd.read_csv('nypd_data/NYPD_Complaint_Data_Historic_10000_subsamples.csv'
 # PD_CD and PD_DESC too granular to make one-hot variables with
 drop = ['Unnamed: 0', 'CMPLNT_TO_DT', 'CMPLNT_TO_TM', 'PARKS_NM', 'HADEVELOPT', 'HOUSING_PSA', 
          'TRANSIT_DISTRICT', 'STATION_NAME', 'JURIS_DESC', 'JURISDICTION_CODE', 'RPT_DT', 'PATROL_BORO',
-         'X_COORD_CD', 'Y_COORD_CD', 'Lat_Lon', 'PD_CD', 'PD_DESC', 'KY_CD','ADDR_PCT_CD']
+         'X_COORD_CD', 'Y_COORD_CD', 'Lat_Lon', 'PD_CD', 'KY_CD','ADDR_PCT_CD']
 nypd = nypd.drop(drop, axis=1)
 
 # Extracting each piece of datetime
@@ -69,7 +69,7 @@ tod = nypd['time_of_day'].values
 season = nypd['season'].values
 
 # List of variables that need one-hot encoding - might want to add year, month to this
-one_hot = ['OFNS_DESC','LAW_CAT_CD','BORO_NM','LOC_OF_OCCUR_DESC','PREM_TYP_DESC','SUSP_AGE_GROUP','SUSP_RACE',
+one_hot = ['OFNS_DESC','PD_DESC','LAW_CAT_CD','BORO_NM','LOC_OF_OCCUR_DESC','PREM_TYP_DESC','SUSP_AGE_GROUP','SUSP_RACE',
            'SUSP_SEX','VIC_AGE_GROUP','VIC_RACE','VIC_SEX','time_of_day','season']
 # Uncomment to check the unique values of each one-hot variable
 # for var in one_hot:
@@ -78,7 +78,7 @@ one_hot = ['OFNS_DESC','LAW_CAT_CD','BORO_NM','LOC_OF_OCCUR_DESC','PREM_TYP_DESC
     
 # Creating dummy variables where applicable - ignoring nan for now (can make a column for them if we want)
 nypd = pd.get_dummies(nypd, columns=one_hot, 
-                      prefix=['off','law_cat','boro','loc','loc_type','susp_age','susp_race',
+                      prefix=['off','off_granular','law_cat','boro','loc','loc_type','susp_age','susp_race',
                               'susp_sex','vic_age','vic_race','vic_sex','tod','season'])
 
 # Adding borough name, time of day, season back in

@@ -26,7 +26,11 @@ def standardize(X_train, X_test):
 ### Main ###
 nypd = pd.read_csv('nypd_data/nypd_10000.csv', parse_dates=['complaint_datetime'])
 nypd = nypd.dropna()
-print(len(nypd.columns))
+print(len(nypd))
+
+nypd = nypd[nypd['boro_STATEN ISLAND'] != 1]
+
+print(len(nypd))
 
 # Getting X data
 # Variables to drop regardless of the analysis
@@ -52,7 +56,7 @@ ros = SMOTE(random_state=0)
 X_resample, y_resample = ros.fit_resample(X, y)
 
 # Splitting
-X_train, X_test, y_train, y_test = train_test_split(X_resample, y_resample, test_size=0.25, random_state=10)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=10)
 
 # Scaling
 X_train, X_test = standardize(X_train, X_test)
@@ -61,7 +65,7 @@ rf = RandomForestClassifier()
 svc = SVC()
 params = {'n_estimators':sstats.randint(10,200)}
 rf_cv = RandomizedSearchCV(estimator=rf, param_distributions=params, n_iter=5)
-clf = OneVsRestClassifier(rf_cv).fit(X_train, y_train)
+clf = OneVsRestClassifier(svc).fit(X_train, y_train)
 pred = clf.predict(X_test)
 print(pd.DataFrame(confusion_matrix(y_test, pred)))
 print(classification_report(y_test, pred))
