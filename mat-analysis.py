@@ -22,12 +22,15 @@ def standardize(X_train, X_test):
 ### Main ###
 nypd = pd.read_csv('nypd_data/nypd_10000.csv', parse_dates=['complaint_datetime'])
 nypd = nypd.dropna()
-print(len(nypd))
+print(len(nypd.columns))
 
 # Getting X data
-drop = ['CMPLNT_NUM','complaint_datetime','boro_BRONX','boro_BROOKLYN','boro_MANHATTAN',
-        'boro_QUEENS','boro_STATEN ISLAND','Latitude','Longitude']
-X = nypd.drop(drop, axis=1)
+drop_always = ['CMPLNT_NUM','complaint_datetime','Latitude','Longitude']
+drop_1_vs_all = ['CMPLNT_NUM','complaint_datetime','boro_BRONX','boro_BROOKLYN','boro_MANHATTAN',
+        'boro_QUEENS','boro_STATEN ISLAND','Latitude','Longitude','BORO_NM']
+drop_multiclass = ['CMPLNT']
+X = nypd.drop(drop_always, axis=1)
+print(len(nypd.columns))
 
 # Response variable - starting with Manhattan
 y = nypd['boro_BRONX'].values
