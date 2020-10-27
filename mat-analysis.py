@@ -7,7 +7,11 @@ import scipy.stats as sstats
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split, GridSearchCV, RandomizedSearchCV
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-from sklearn.metrics import accuracy_score
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score, auc, confusion_matrix, classification_report
+from sklearn.multiclass import OneVsRestClassifier
+from imblearn.over_sampling import RandomOverSampler, SMOTE
+from imblearn.under_sampling import RandomUnderSampler
 
 ### Functions ###
 def standardize(X_train, X_test):
@@ -41,23 +45,32 @@ X = nypd.drop(drop, axis=1)
 print(len(nypd.columns))
 
 # Response variable - starting with Manhattan
-y = nypd['boro_BRONX'].values
+y = nypd['BORO_NM'].values
+
+# Resampling
+ros = SMOTE(random_state=0)
+X_resample, y_resample = ros.fit_resample(X, y)
 
 # Splitting
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=10)
+X_train, X_test, y_train, y_test = train_test_split(X_resample, y_resample, test_size=0.25, random_state=10)
 
 # Scaling
 X_train, X_test = standardize(X_train, X_test)
 
-# Trying a random forest classifier (should ignore NA values)
 rf = RandomForestClassifier()
+svc = SVC()
 params = {'n_estimators':sstats.randint(10,200)}
 rf_cv = RandomizedSearchCV(estimator=rf, param_distributions=params, n_iter=5)
-rf_cv.fit(X_train, y_train)
-pred = rf_cv.predict(X_test)
+clf = OneVsRestClassifier(rf_cv).fit(X_train, y_train)
+pred = clf.predict(X_test)
+print(pd.DataFrame(confusion_matrix(y_test, pred)))
+print(classification_report(y_test, pred))
 print(accuracy_score(y_test, pred))
 
-
-
-
+# svc = SVC()
+# svc.fit(X_train, y_train)
+# pred = svc.predict(X_test)
+# print(pd.DataFrame(confusion_matrix(y_test, pred)))
+# print(classification_report(y_test, pred))
+# print(accuracy_score(y_test, pred))
 
