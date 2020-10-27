@@ -47,6 +47,3 @@ pred = rf_cv.predict(X_test)
 print(accuracy_score(y_test, pred))
 
 
-
-
-

@@ -7,13 +7,14 @@ import scipy.stats as sstats
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split, GridSearchCV, RandomizedSearchCV
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.decomposition import PCA
-from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.naive_bayes import GaussianNB
+from sklearn.ensemble import RandomForestClassifier
+
+from sklearn.metrics import plot_roc_curve
+
 ### Functions ###
 def standardize(X_train, X_test):
     scaler = StandardScaler()
@@ -60,10 +61,18 @@ plt.scatter(transformed_data[:, 0][class_1], transformed_data[:, 1][class_1])
 plt.scatter(transformed_data[:, 0][class_2], transformed_data[:, 1][class_2])
 plt.scatter(transformed_data[:, 0][class_3], transformed_data[:, 1][class_3])
 plt.scatter(transformed_data[:, 0][class_4], transformed_data[:, 1][class_4])
-plt.show()
+#plt.show()
 
 
 #Mat did random forest below are the results
+
+# Trying a random forest classifier (should ignore NA values)
+rf = RandomForestClassifier()
+params = {'n_estimators':sstats.randint(10,200)}
+rf_cv = RandomizedSearchCV(estimator=rf, param_distributions=params, n_iter=5)
+rf_cv.fit(X_train, y_train)
+pred = rf_cv.predict(X_test)
+print(accuracy_score(y_test, pred))
 
 #Bronx got an accuracy of 0.777 using random forest
 
@@ -73,29 +82,29 @@ plt.show()
 
 #Queens got an accuracy of 0.816211 using random forest
 
-#Staten Island got an accuracy of 0.96 using random fores
+#Staten Island got an accuracy of 0.96 using random forest (not a good measurement due to skew)
 
 #if we try to predict the boro in one model we get
-#a very bad accuracy score of 0.398 using random forest
+#a accuracy score of 0.398 using random forest (maybe should use a different accuracy measurement due to skew)
 
 #building a KNN neighbors model
 #for i in range(1,105,2):
 
-KNN = KNeighborsClassifier(n_neighbors=35)
-KNN.fit(X_train, y_train)
-pred = KNN.predict(X_test)
-print("Accuracy: ", accuracy_score(y_test, pred), " for k = ",35)
+#KNN = KNeighborsClassifier(n_neighbors=35)
+#KNN.fit(X_train, y_train)
+#pred = KNN.predict(X_test)
+#print("Accuracy: ", accuracy_score(y_test, pred), " for k = ",35)
 
 #seems to reach a max around k = 35
 
 #lets look at the confusion matrix
-confKNN = confusion_matrix(y_test, pred)
+#confKNN = confusion_matrix(y_test, pred)
 
-confKNNpd = pd.DataFrame(confKNN)
-print(confKNNpd)
+#confKNNpd = pd.DataFrame(confKNN)
+#print(confKNNpd)
 
-
-
+#lets get the f1 score
+#print(classification_report(y_test, pred))
 
 
 
