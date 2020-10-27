@@ -74,3 +74,5 @@ print(accuracy_score(y_test, pred))
 # print(classification_report(y_test, pred))
 # print(accuracy_score(y_test, pred))
 
+
+
