@@ -8,6 +8,9 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split, GridSearchCV, RandomizedSearchCV
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.metrics import accuracy_score
+from sklearn.svm import SVC
+from sklearn.linear_model import LogisticRegression
+
 
 ### Functions ###
 def standardize(X_train, X_test):
@@ -20,7 +23,7 @@ def standardize(X_train, X_test):
     return X_train, X_test
 
 ### Main ###
-nypd = pd.read_csv('nypd_data/nypd_10000.csv', parse_dates=['complaint_datetime'])
+nypd = pd.read_csv('nypd_data/nypd_10000', parse_dates=['complaint_datetime'])
 nypd = nypd.dropna()
 print(len(nypd))
 
@@ -47,8 +50,16 @@ pred = rf_cv.predict(X_test)
 print(accuracy_score(y_test, pred))
 
 
+# Trying an SVM classifier
+sv = SVC(kernel = 'linear')
+sv.fit(X_train, y_train)
+svm_p = sv.predict(X_test)
+print(accuracy_score(y_test,svm_p))
+
+# Logistic Regression
+log_r = LogisticRegression()
+log_r.fit(X_train,y_train)
+classifier = log_r.predict(X_test)
 
 
-
-
-
+print("hello world")
