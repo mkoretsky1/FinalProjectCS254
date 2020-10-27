@@ -66,14 +66,6 @@ plt.scatter(transformed_data[:, 0][class_4], transformed_data[:, 1][class_4])
 
 #Mat did random forest below are the results
 
-# Trying a random forest classifier (should ignore NA values)
-rf = RandomForestClassifier()
-params = {'n_estimators':sstats.randint(10,200)}
-rf_cv = RandomizedSearchCV(estimator=rf, param_distributions=params, n_iter=5)
-rf_cv.fit(X_train, y_train)
-pred = rf_cv.predict(X_test)
-print(accuracy_score(y_test, pred))
-
 #Bronx got an accuracy of 0.777 using random forest
 
 #Manhattan got an accuracy of 0.767 using random forest
@@ -90,21 +82,21 @@ print(accuracy_score(y_test, pred))
 #building a KNN neighbors model
 #for i in range(1,105,2):
 
-#KNN = KNeighborsClassifier(n_neighbors=35)
-#KNN.fit(X_train, y_train)
-#pred = KNN.predict(X_test)
-#print("Accuracy: ", accuracy_score(y_test, pred), " for k = ",35)
+KNN = KNeighborsClassifier(n_neighbors=35)
+KNN.fit(X_train, y_train)
+pred = KNN.predict(X_test)
+print("Accuracy: ", accuracy_score(y_test, pred), " for k = ",35)
 
 #seems to reach a max around k = 35
 
 #lets look at the confusion matrix
-#confKNN = confusion_matrix(y_test, pred)
+confKNN = confusion_matrix(y_test, pred)
 
-#confKNNpd = pd.DataFrame(confKNN)
-#print(confKNNpd)
+confKNNpd = pd.DataFrame(confKNN)
+print(confKNNpd)
 
-#lets get the f1 score
-#print(classification_report(y_test, pred))
+#lets get the full report
+print(classification_report(y_test, pred))
 
 
 
