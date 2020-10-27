@@ -60,6 +60,4 @@ print(accuracy_score(y_test,svm_p))
 log_r = LogisticRegression()
 log_r.fit(X_train,y_train)
 classifier = log_r.predict(X_test)
-
-
-print("hello world")
+print(accuracy_score(y_test,log_r))
