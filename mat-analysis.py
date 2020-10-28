@@ -70,13 +70,3 @@ pred = clf.predict(X_test)
 print(pd.DataFrame(confusion_matrix(y_test, pred)))
 print(classification_report(y_test, pred))
 print(accuracy_score(y_test, pred))
-
-# svc = SVC()
-# svc.fit(X_train, y_train)
-# pred = svc.predict(X_test)
-# print(pd.DataFrame(confusion_matrix(y_test, pred)))
-# print(classification_report(y_test, pred))
-# print(accuracy_score(y_test, pred))
-
-
-

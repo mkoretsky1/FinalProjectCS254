@@ -107,12 +107,12 @@ nypd['SUSP_AGE_GROUP'] = nypd['SUSP_AGE_GROUP'].apply(age_groups)
 nypd['VIC_AGE_GROUP'] = nypd['VIC_AGE_GROUP'].apply(age_groups)
 
 # List of variables that need one-hot encoding
-one_hot = ['OFNS_DESC','LAW_CAT_CD','BORO_NM','LOC_OF_OCCUR_DESC','PREM_TYP_DESC','SUSP_AGE_GROUP','SUSP_RACE',
+one_hot = ['OFNS_DESC','LAW_CAT_CD','LOC_OF_OCCUR_DESC','PREM_TYP_DESC','SUSP_AGE_GROUP','SUSP_RACE',
            'SUSP_SEX','VIC_AGE_GROUP','VIC_RACE','VIC_SEX']
 
 # Creating dummy variables where applicable - ignoring nan for now (can make a column for them if we want)
 nypd = pd.get_dummies(nypd, columns=one_hot,
-                      prefix=['off','law_cat','boro','loc','loc_type','susp_age','susp_race',
+                      prefix=['off','law_cat','loc','loc_type','susp_age','susp_race',
                               'susp_sex','vic_age','vic_race','vic_sex'])
 # Output to csv
 nypd.to_csv('nypd_data/nypd_10000.csv')
