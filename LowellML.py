@@ -3,17 +3,17 @@
 ### Imports ###
 import numpy as np
 import pandas as pd
-import scipy.stats as sstats
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split, GridSearchCV, RandomizedSearchCV
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import confusion_matrix, classification_report
+from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.decomposition import PCA
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import plot_confusion_matrix
 
-from sklearn.metrics import plot_roc_curve
+
 
 ### Functions ###
 def standardize(X_train, X_test):
@@ -21,7 +21,7 @@ def standardize(X_train, X_test):
     # Fitting and transforming training data
     scaler.fit(X_train)
     X_train = scaler.transform(X_train)
-    # Tranforming testing data based on traning fit (prevent data leakage)
+    # Tranforming testing data based on training fit (prevent data leakage)
     X_test = scaler.transform(X_test)
     return X_train, X_test
 
@@ -56,12 +56,16 @@ class_3 = np.where(y_train == "STATEN ISLAND")
 class_4 = np.where(y_train == "MANHATTAN")
 
 # plotting of transformed data by class
-plt.scatter(transformed_data[:, 0][class_0], transformed_data[:, 1][class_0])
-plt.scatter(transformed_data[:, 0][class_1], transformed_data[:, 1][class_1])
-plt.scatter(transformed_data[:, 0][class_2], transformed_data[:, 1][class_2])
-plt.scatter(transformed_data[:, 0][class_3], transformed_data[:, 1][class_3])
-plt.scatter(transformed_data[:, 0][class_4], transformed_data[:, 1][class_4])
-#plt.show()
+fig, ax = plt.subplots(figsize=(10, 8))
+plt.scatter(transformed_data[:, 0][class_0], transformed_data[:, 1][class_0], label = "Bronx")
+plt.scatter(transformed_data[:, 0][class_1], transformed_data[:, 1][class_1], label = "Brooklyn")
+plt.scatter(transformed_data[:, 0][class_2], transformed_data[:, 1][class_2], label = "Queens" )
+plt.scatter(transformed_data[:, 0][class_3], transformed_data[:, 1][class_3], label = "Staten Island ")
+plt.scatter(transformed_data[:, 0][class_4], transformed_data[:, 1][class_4], label = "Manhatten")
+plt.legend()
+plt.xlabel("Principal Component 1")
+plt.ylabel("Principal Component 2")
+plt.show()
 
 
 #Mat did random forest below are the results
@@ -97,6 +101,34 @@ print(confKNNpd)
 
 #lets get the full report
 print(classification_report(y_test, pred))
+
+#create a confusion matrix visualization
+
+fig, ax = plt.subplots(figsize=(10, 8))
+plot_confusion_matrix(KNN,X_test,y_test, ax = ax)
+plt.title('K Nearest Neighbors Confusion Matrix')
+plt.show()
+
+# Trying gradient boosting
+gbr = GradientBoostingClassifier()
+gbr.fit(X_train, y_train)
+pred = gbr.predict(X_test)
+
+#lets look at the confusion matrix
+confGBR = confusion_matrix(y_test, pred)
+
+confGBRpd = pd.DataFrame(confGBR)
+print(confGBRpd)
+
+#lets get the full report
+print(classification_report(y_test, pred))
+
+#create visualization for confusion matrix
+
+fig, ax = plt.subplots(figsize=(10, 8))
+plot_confusion_matrix(gbr,X_test,y_test, ax = ax)
+plt.title('Gradient Boosting Confusion Matrix')
+plt.show()
 
 
 
