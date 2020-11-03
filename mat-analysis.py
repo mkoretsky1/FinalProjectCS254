@@ -28,10 +28,6 @@ nypd = pd.read_csv('nypd_data/nypd_10000.csv', parse_dates=['complaint_datetime'
 nypd = nypd.dropna()
 print(len(nypd))
 
-nypd = nypd[nypd['boro_STATEN ISLAND'] != 1]
-
-print(len(nypd))
-
 # Getting X data
 # Variables to drop regardless of the analysis
 drop_always = ['CMPLNT_NUM','complaint_datetime','BORO_NM','time_of_day','season','tod_afternoon',
