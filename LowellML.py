@@ -5,13 +5,17 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split,RandomizedSearchCV
+import scipy.stats as sstats
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.decomposition import PCA
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import plot_confusion_matrix
+from sklearn.metrics import accuracy_score, auc, confusion_matrix, classification_report
+from sklearn.multiclass import OneVsRestClassifier
+from imblearn.over_sampling import RandomOverSampler, SMOTE
 
 
 
@@ -28,7 +32,8 @@ def standardize(X_train, X_test):
 ### Main ###
 nypd = pd.read_csv('nypd_data/nypd_10000.csv', parse_dates=['complaint_datetime'])
 nypd = nypd.dropna()
-print(len(nypd))
+print(len(nypd.columns))
+
 
 # Getting X data
 # Variables to drop regardless of the analysis
@@ -44,14 +49,19 @@ drop_for_season_analysis = ['month']
 # Creating one list of variables to drop - Edit this line based on analysis being performed
 drop = drop_always + drop_for_location_analysis
 X = nypd.drop(drop, axis=1)
+print(len(nypd.columns))
 
-# Response variable - starting with Manhattan
+# Response variable
 y = nypd['BORO_NM'].values
+
+# Resampling
+ros = SMOTE(random_state=0)
+X_resample, y_resample = ros.fit_resample(X, y)
 
 # Splitting
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=10)
 
-# Scaling
+# Standardizing
 X_train, X_test = standardize(X_train, X_test)
 
 #lets try looking at the split of the boros with PCA
@@ -95,49 +105,37 @@ plt.show()
 #a accuracy score of 0.398 using random forest (maybe should use a different accuracy measurement due to skew)
 
 #building a KNN neighbors model
-#for i in range(1,105,2):
-
-KNN = KNeighborsClassifier(n_neighbors=35)
-KNN.fit(X_train, y_train)
-pred = KNN.predict(X_test)
-print("Accuracy: ", accuracy_score(y_test, pred), " for k = ",35)
-
-#seems to reach a max around k = 35
-
-#lets look at the confusion matrix
-confKNN = confusion_matrix(y_test, pred)
-
-confKNNpd = pd.DataFrame(confKNN)
-print(confKNNpd)
-
-#lets get the full report
+KNN = KNeighborsClassifier()
+params = {'n_neighbors':sstats.randint(5,100)}
+KNN_cv = RandomizedSearchCV(estimator=KNN, param_distributions=params, n_iter=5)
+clf = OneVsRestClassifier(KNN_cv).fit(X_train, y_train)
+pred = clf.predict(X_test)
+print(pd.DataFrame(confusion_matrix(y_test, pred)))
 print(classification_report(y_test, pred))
+print(accuracy_score(y_test, pred))
 
 #create a confusion matrix visualization
 
 fig, ax = plt.subplots(figsize=(10, 8))
-plot_confusion_matrix(KNN,X_test,y_test, ax = ax)
+plot_confusion_matrix(clf,X_test,y_test, ax = ax)
 plt.title('K Nearest Neighbors Confusion Matrix')
 plt.show()
 
 # Trying gradient boosting
 gbr = GradientBoostingClassifier()
-gbr.fit(X_train, y_train)
-pred = gbr.predict(X_test)
-
-#lets look at the confusion matrix
-confGBR = confusion_matrix(y_test, pred)
-
-confGBRpd = pd.DataFrame(confGBR)
-print(confGBRpd)
-
-#lets get the full report
+params = {'n_estimators':sstats.randint(10,200)}
+gbr_cv = RandomizedSearchCV(estimator=gbr, param_distributions=params, n_iter=5)
+clf = OneVsRestClassifier(KNN_cv).fit(X_train, y_train)
+pred = clf.predict(X_test)
+print(pd.DataFrame(confusion_matrix(y_test, pred)))
 print(classification_report(y_test, pred))
+print(accuracy_score(y_test, pred))
+
 
 #create visualization for confusion matrix
 
 fig, ax = plt.subplots(figsize=(10, 8))
-plot_confusion_matrix(gbr,X_test,y_test, ax = ax)
+plot_confusion_matrix(clf,X_test,y_test, ax = ax)
 plt.title('Gradient Boosting Confusion Matrix')
 plt.show()
 
