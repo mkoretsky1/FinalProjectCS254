@@ -6,7 +6,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split,RandomizedSearchCV
-import scipy.stats as sstats
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.ensemble import GradientBoostingClassifier
@@ -106,8 +105,9 @@ plt.show()
 
 #building a KNN neighbors model
 KNN = KNeighborsClassifier()
-params = {'n_neighbors':sstats.randint(5,100)}
-KNN_cv = RandomizedSearchCV(estimator=KNN, param_distributions=params, n_iter=5)
+params = {'n_neighbors':[5,10,15,20,25,30,35],
+          'weights':['uniform', 'distance']}
+KNN_cv = RandomizedSearchCV(estimator=KNN, param_distributions=params, n_iter=5,scoring='f1_weighted')
 clf = OneVsRestClassifier(KNN_cv).fit(X_train, y_train)
 pred = clf.predict(X_test)
 print(pd.DataFrame(confusion_matrix(y_test, pred)))
@@ -123,9 +123,10 @@ plt.show()
 
 # Trying gradient boosting
 gbr = GradientBoostingClassifier()
-params = {'n_estimators':sstats.randint(10,200)}
-gbr_cv = RandomizedSearchCV(estimator=gbr, param_distributions=params, n_iter=5)
-clf = OneVsRestClassifier(KNN_cv).fit(X_train, y_train)
+params = {'n_estimators':[25,50,75,100,150,200],
+          'loss':['deviance','exponential'],}
+gbr_cv = RandomizedSearchCV(estimator=gbr, param_distributions=params, n_iter=5,scoring='f1_weighted')
+clf = OneVsRestClassifier(gbr_cv).fit(X_train, y_train)
 pred = clf.predict(X_test)
 print(pd.DataFrame(confusion_matrix(y_test, pred)))
 print(classification_report(y_test, pred))
