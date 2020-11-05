@@ -30,19 +30,22 @@ def season_groups(month):
         return 'fall'
     
 ### Main ###
-nypd = pd.read_csv('nypd_data/NYPD_Complaint_Data_Historic_10000_subsamples.csv', 
+nypd = pd.read_csv('nypd_data/NYPD_Complaint_Data_Historic.csv', 
                          parse_dates=['CMPLNT_FR_DT','CMPLNT_FR_TM'])
 
 # Columns to drop - mostly based on information for website where data was downloaded
 # X coord and Y coord not needed when we have latitude and longitude
 # PD_CD and PD_DESC too granular to make one-hot variables with
-drop = ['Unnamed: 0', 'CMPLNT_TO_DT', 'CMPLNT_TO_TM', 'PARKS_NM', 'HADEVELOPT', 'HOUSING_PSA', 
+drop = ['CMPLNT_TO_DT', 'CMPLNT_TO_TM', 'PARKS_NM', 'HADEVELOPT', 'HOUSING_PSA', 
          'TRANSIT_DISTRICT', 'STATION_NAME', 'JURIS_DESC', 'JURISDICTION_CODE', 'RPT_DT', 'PATROL_BORO',
          'X_COORD_CD', 'Y_COORD_CD', 'Lat_Lon', 'PD_CD', 'KY_CD','ADDR_PCT_CD']
 nypd = nypd.drop(drop, axis=1)
 
 # Extracting each piece of datetime
-nypd['CMPLNT_FR_DT'] = nypd.CMPLNT_FR_DT.replace({'1019':'2019', '1016':'2016', '1017':'2017'}, regex = True)
+nypd['CMPLNT_FR_DT'] = nypd.CMPLNT_FR_DT.replace({'1019':'2019', '1016':'2016', '1017':'2017',
+                                                  '1015':'2015','1018':'2018','1028':'2018',
+                                                  '1027':'2017','1026':'2016','1025':'2015',
+                                                  '1029':'2019'}, regex = True)
 nypd['year'] = pd.DatetimeIndex(nypd['CMPLNT_FR_DT']).year
 nypd['month'] = pd.DatetimeIndex(nypd['CMPLNT_FR_DT']).month
 nypd['day'] = pd.DatetimeIndex(nypd['CMPLNT_FR_DT']).day
@@ -94,7 +97,7 @@ nypd['time_of_day'] = tod
 nypd['season'] = season
 
 # Output to csv
-nypd.to_csv('nypd_data/nypd_10000.csv')
+nypd.to_csv('nypd_data/nypd.csv')
 
 
 
