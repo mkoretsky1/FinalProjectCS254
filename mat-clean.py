@@ -11,6 +11,22 @@ def age_groups(age):
     else:
         return 'UNKNOWN'
     
+def map_race(race):
+    if race == 'AMERICAN INDIAN/ALAKAN NATIVE':
+        return 1
+    elif race == 'ASIAN / PACIFIC ISLANDER' or race == 'ASIAN/PACIFIC ISLANDER':
+        return 2
+    elif race == 'BLACK':
+        return 3
+    elif race == 'BLACK HISPANIC':
+        return 4
+    elif race == 'UNKNOWN':
+        return 0
+    elif race == 'WHITE':
+        return 5
+    elif race == 'WHITE HISPANIC':
+        return 6
+    
 def tod_groups(hour):
     if hour < 12:
         return 'morning'
@@ -30,7 +46,7 @@ def season_groups(month):
         return 'fall'
     
 ### Main ###
-nypd = pd.read_csv('nypd_data/NYPD_Complaint_Data_Historic.csv', 
+nypd = pd.read_csv('nypd_data/NYPD_Complaint_Data_Historic_10000_subsamples.csv', 
                          parse_dates=['CMPLNT_FR_DT','CMPLNT_FR_TM'])
 
 # Columns to drop - mostly based on information for website where data was downloaded
@@ -66,21 +82,30 @@ nypd['SUSP_AGE_GROUP'] = nypd['SUSP_AGE_GROUP'].apply(age_groups)
 nypd['VIC_AGE_GROUP'] = nypd['VIC_AGE_GROUP'].apply(age_groups)
 
 # Mapping age variables
-nypd['SUSP_AGE_GROUP'] = nypd['SUSP_AGE_GROUP'].map({'UNKNOWN':np.nan,'<18':0,'18-24':1,'25-44':2,'45-64':3,'65+':4})
-nypd['VIC_AGE_GROUP'] = nypd['VIC_AGE_GROUP'].map({'UNKNOWN':np.nan,'<18':0,'18-24':1,'25-44':2,'45-64':3,'65+':4})
+nypd['SUSP_AGE_GROUP'] = nypd['SUSP_AGE_GROUP'].map({'UNKNOWN':0,'<18':1,'18-24':2,'25-44':3,'45-64':4,'65+':5})
+nypd['VIC_AGE_GROUP'] = nypd['VIC_AGE_GROUP'].map({'UNKNOWN':0,'<18':1,'18-24':2,'25-44':3,'45-64':4,'65+':5})
+
+# Mapping sex variables
+nypd['SUSP_SEX'] = nypd['SUSP_SEX'].map({'UNKNOWN':0,'D':1,'E':2,'F':3,'M':4})
+nypd['VIC_SEX'] = nypd['SUSP_SEX'].map({'UNKNOWN':0,'D':1,'E':2,'F':3,'M':4})
+
+# Mapping race variables
+nypd['SUSP_RACE'] = nypd['SUSP_RACE'].apply(map_race)
+nypd['VIC_RACE'] = nypd['VIC_RACE'].apply(map_race)
+
+# Mapping general location variables
+nypd['LOC_OF_OCCUR_DESC'] = nypd['LOC_OF_OCCUR_DESC'].map({'FRONT OF':0,'INSIDE':1,'OPPOSITE OF':2,
+                                                           'OUTSIDE':3,'REAR OF':4})
 
 # Creating categorical variables for time of day and season
-nypd['time_of_day'] = nypd['hour'].apply(tod_groups)
-nypd['season'] = nypd['month'].apply(season_groups)
+# nypd['time_of_day'] = nypd['hour'].apply(tod_groups)
+# nypd['season'] = nypd['month'].apply(season_groups)
 
-# Storing borough name, time of day, season to add back after dummy variable creation
+# Storing borough name to add back after dummy variable creation
 borough_name = nypd['BORO_NM'].values
-tod = nypd['time_of_day'].values
-season = nypd['season'].values
 
 # List of variables that need one-hot encoding - might want to add year, month to this
-one_hot = ['OFNS_DESC','PD_DESC','BORO_NM','LOC_OF_OCCUR_DESC','PREM_TYP_DESC','SUSP_RACE',
-           'SUSP_SEX','VIC_RACE','VIC_SEX','time_of_day','season']
+one_hot = ['OFNS_DESC','PD_DESC','BORO_NM','PREM_TYP_DESC']
 # Uncomment to check the unique values of each one-hot variable
 # for var in one_hot:
 #     print(var)
@@ -88,16 +113,13 @@ one_hot = ['OFNS_DESC','PD_DESC','BORO_NM','LOC_OF_OCCUR_DESC','PREM_TYP_DESC','
     
 # Creating dummy variables where applicable - ignoring nan for now (can make a column for them if we want)
 nypd = pd.get_dummies(nypd, columns=one_hot, 
-                      prefix=['off','off_granular','boro','loc','loc_type','susp_race',
-                              'susp_sex','vic_race','vic_sex','tod','season'])
+                      prefix=['off','off_granular','boro','loc_type'])
 
-# Adding borough name, time of day, season back in
+# Adding borough name back in
 nypd['BORO_NM'] = borough_name
-nypd['time_of_day'] = tod
-nypd['season'] = season
 
 # Output to csv
-nypd.to_csv('nypd_data/nypd.csv')
+nypd.to_csv('nypd_data/nypd_10000.csv')
 
 
 
