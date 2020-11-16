@@ -4,7 +4,9 @@
 import numpy as np
 import pandas as pd
 import scipy.stats as sstats
+import model_setup
 from sklearn.preprocessing import StandardScaler
+from sklearn.utils import resample
 from sklearn.model_selection import train_test_split, GridSearchCV, RandomizedSearchCV
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.svm import SVC
@@ -13,55 +15,58 @@ from sklearn.multiclass import OneVsRestClassifier
 from imblearn.over_sampling import RandomOverSampler, SMOTE
 from imblearn.under_sampling import RandomUnderSampler
 
-### Functions ###
-def standardize(X_train, X_test):
-    scaler = StandardScaler()
-    # Fitting and transforming training data
-    scaler.fit(X_train)
-    X_train = scaler.transform(X_train)
-    # Tranforming testing data based on traning fit (prevent data leakage)
-    X_test = scaler.transform(X_test)
-    return X_train, X_test
-
 ### Main ###
-nypd = pd.read_csv('nypd_data/nypd_10000.csv', parse_dates=['complaint_datetime'])
-
-# Getting X data
-# Variables to drop regardless of the analysis
-drop_always = ['CMPLNT_NUM','SUSP_RACE','SUSP_SEX','VIC_SEX','complaint_datetime','Unnamed: 0']
-# Variables to drop when performing classification for location
-drop_for_location_analysis = ['Latitude','Longitude','boro_BRONX','boro_BROOKLYN','boro_MANHATTAN',
-                              'boro_QUEENS','boro_STATEN ISLAND']
-# Creating one list of variables to drop - Edit this line based on analysis being performed
-drop = drop_always + drop_for_location_analysis
-nypd = nypd.drop(drop, axis=1)
-
-nypd = nypd.dropna(axis=0)
+# Setting up
+nypd = model_setup.set_up()
 print(len(nypd))
 
-X = nypd.drop(['BORO_NM'], axis=1)
+# Splitting data
+X_train, X_test, y_train, y_test = model_setup.split_data(nypd)
 
-# Response variable
-y = nypd['BORO_NM'].values
+# Standardizing data
+X_train, X_test = model_setup.standardize(X_train, X_test)
 
-# Oversampling
-ros = SMOTE(random_state=0)
-#X_resample, y_resample = ros.fit_resample(X, y)
+# Joining training data back together (for over and undersampling)
+X = pd.DataFrame(X_train)
 
-# Splitting
-X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.80)
+# Adding borough name variable back in
+X['BORO_NM'] = y_train
 
-# Scaling
-X_train, X_test = standardize(X_train, X_test)
+# Separating categories
+bronx = X[X.BORO_NM=='BRONX']
+brooklyn = X[X.BORO_NM=='BROOKLYN']
+manhattan = X[X.BORO_NM=='MANHATTAN']
+queens = X[X.BORO_NM=='QUEENS']
+staten = X[X.BORO_NM=='STATEN ISLAND']
+other = X[X.BORO_NM!='STATEN ISLAND']
 
-rf = RandomForestClassifier(class_weight='balanced')
-params = {'n_estimators':[25,50,75,100,150,200], 'max_depth':[2,3,4,5,6,7,8,9,10],
-          'max_features':['sqrt','log2',25,50,75,100]}
-rf_cv = RandomizedSearchCV(estimator=rf, param_distributions=params, n_iter=5, scoring='f1_weighted')
-clf = OneVsRestClassifier(estimator=rf_cv)
+# Getting the lengths 
+print(len(bronx), len(brooklyn), len(manhattan), len(queens), len(staten), len(other))
+
+# Oversampling Staten Island
+staten_over = resample(staten,replace=True,n_samples=len(manhattan),random_state=10)
+print(len(staten_over))
+
+# Reseparating training data
+X_train = pd.concat([other, staten_over])
+y_train = X_train.BORO_NM
+X_train = X_train.drop(['BORO_NM'],axis=1)
+
+# Random forest
+rf_cv = model_setup.random_forest()
+
+# Checking cross-validation results
+## Comment these two lines out when specifying scoring metric in cross-validation
+## Note: seeing best performance for random forest when auc is used as the metric
 rf_cv.fit(X_train, y_train)
+print(rf_cv.best_params_)
 
-pred = rf_cv.predict(X_test)
+# One vs rest classifier for testing
+clf = OneVsRestClassifier(estimator=rf_cv)
+clf.fit(X_train, y_train)
+pred = clf.predict(X_test)
+
+# Confusion matrix, classification report, accuracy
 print(pd.DataFrame(confusion_matrix(y_test, pred)))
 print(classification_report(y_test, pred))
 print(accuracy_score(y_test, pred))
