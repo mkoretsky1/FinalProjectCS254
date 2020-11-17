@@ -118,12 +118,6 @@ nypd = pd.get_dummies(nypd, columns=one_hot,
 # Adding borough name back in
 nypd['BORO_NM'] = borough_name
 
-#deleting the added unnamed feature
-print(nypd.head())
-
-nypd = nypd.drop(["Unnamed: 0"], axis=1)
-
-print(nypd.head())
 
 # Output to csv
 nypd.to_csv('nypd_data/nypd_10000.csv')

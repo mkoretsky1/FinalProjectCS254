@@ -111,10 +111,7 @@ plt.show()
 #a accuracy score of 0.398 using random forest (maybe should use a different accuracy measurement due to skew)
 
 #building a KNN neighbors model
-KNN = KNeighborsClassifier()
-params = {'n_neighbors':[5,10,15,20,25,30,35],
-          'weights':['uniform', 'distance']}
-KNN_cv = RandomizedSearchCV(estimator=KNN, param_distributions=params, n_iter=5,scoring='f1_weighted')
+knn_cv = model_setup.k_nearest_neighbors()
 clf = OneVsRestClassifier(KNN_cv).fit(X_train, y_train)
 pred = clf.predict(X_test)
 print(pd.DataFrame(confusion_matrix(y_test, pred)))
@@ -129,10 +126,7 @@ plt.title('K Nearest Neighbors Confusion Matrix')
 plt.show()
 
 # Trying gradient boosting
-gbr = GradientBoostingClassifier()
-params = {'n_estimators':[25,50,75,100,150,200],
-          'loss':['deviance','exponential'],}
-gbr_cv = RandomizedSearchCV(estimator=gbr, param_distributions=params, n_iter=5,scoring='f1_weighted')
+gbr_cv = model_setup.gradient_boosting()
 clf = OneVsRestClassifier(gbr_cv).fit(X_train, y_train)
 pred = clf.predict(X_test)
 print(pd.DataFrame(confusion_matrix(y_test, pred)))
@@ -146,6 +140,8 @@ fig, ax = plt.subplots(figsize=(10, 8))
 plot_confusion_matrix(clf,X_test,y_test, ax = ax)
 plt.title('Gradient Boosting Confusion Matrix')
 plt.show()
+
+
 
 
 
