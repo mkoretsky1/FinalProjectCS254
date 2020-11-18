@@ -118,6 +118,7 @@ nypd = pd.get_dummies(nypd, columns=one_hot,
 # Adding borough name back in
 nypd['BORO_NM'] = borough_name
 
+
 # Output to csv
 nypd.to_csv('nypd_data/nypd_10000.csv')
 
