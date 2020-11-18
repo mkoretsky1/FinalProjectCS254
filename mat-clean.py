@@ -2,7 +2,6 @@
 
 ### Imports ###
 import pandas as pd
-import numpy as np
 
 ### Functions ###
 def age_groups(age):
@@ -46,7 +45,7 @@ def season_groups(month):
         return 'fall'
     
 ### Main ###
-nypd = pd.read_csv('nypd_data/NYPD_Complaint_Data_Historic_10000_subsamples.csv', 
+nypd = pd.read_csv('nypd_data/NYPD_Complaint_Data_Historic.csv', 
                          parse_dates=['CMPLNT_FR_DT','CMPLNT_FR_TM'])
 
 # Columns to drop - mostly based on information for website where data was downloaded
@@ -87,7 +86,7 @@ nypd['VIC_AGE_GROUP'] = nypd['VIC_AGE_GROUP'].map({'UNKNOWN':0,'<18':1,'18-24':2
 
 # Mapping sex variables
 nypd['SUSP_SEX'] = nypd['SUSP_SEX'].map({'UNKNOWN':0,'D':1,'E':2,'F':3,'M':4})
-nypd['VIC_SEX'] = nypd['SUSP_SEX'].map({'UNKNOWN':0,'D':1,'E':2,'F':3,'M':4})
+nypd['VIC_SEX'] = nypd['VIC_SEX'].map({'UNKNOWN':0,'D':1,'E':2,'F':3,'M':4})
 
 # Mapping race variables
 nypd['SUSP_RACE'] = nypd['SUSP_RACE'].apply(map_race)
@@ -105,7 +104,7 @@ nypd['LOC_OF_OCCUR_DESC'] = nypd['LOC_OF_OCCUR_DESC'].map({'FRONT OF':0,'INSIDE'
 borough_name = nypd['BORO_NM'].values
 
 # List of variables that need one-hot encoding - might want to add year, month to this
-one_hot = ['OFNS_DESC','PD_DESC','BORO_NM','PREM_TYP_DESC']
+one_hot = ['OFNS_DESC','PD_DESC','PREM_TYP_DESC']
 # Uncomment to check the unique values of each one-hot variable
 # for var in one_hot:
 #     print(var)
@@ -113,14 +112,14 @@ one_hot = ['OFNS_DESC','PD_DESC','BORO_NM','PREM_TYP_DESC']
     
 # Creating dummy variables where applicable - ignoring nan for now (can make a column for them if we want)
 nypd = pd.get_dummies(nypd, columns=one_hot, 
-                      prefix=['off','off_granular','boro','loc_type'])
+                      prefix=['off','off_granular','loc_type'])
 
 # Adding borough name back in
 nypd['BORO_NM'] = borough_name
 
 
 # Output to csv
-nypd.to_csv('nypd_data/nypd_10000.csv')
+nypd.to_csv('nypd_data/nypd.csv')
 
 
 
