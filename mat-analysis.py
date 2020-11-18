@@ -77,13 +77,15 @@ rf_cv = model_setup.random_forest()
 # Checking cross-validation results
 ## Comment these two lines out when specifying scoring metric in cross-validation
 ## Note: seeing best performance for random forest when auc is used as the metric
-rf_cv.fit(X_train, y_train)
-print(rf_cv.best_params_)
+# rf_cv.fit(X_train, y_train)
+# print(rf_cv.best_params_)
 
 # One vs rest classifier for testing
 clf = OneVsRestClassifier(estimator=rf_cv)
 clf.fit(X_train, y_train)
 pred = clf.predict(X_test)
+
+print(clf.estimators_[0].best_estimator_.feature_importances_)
 
 # Confusion matrix, classification report
 print(pd.DataFrame(confusion_matrix(y_test, pred)))

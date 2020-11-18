@@ -45,6 +45,16 @@ def random_forest():
     rf_cv = RandomizedSearchCV(estimator=rf, param_distributions=params, n_iter=5)
     return rf_cv
 
+def k_nearest_neighbors():
+    KNN = KNeighborsClassifier()
+    params = {'n_neighbors': [5, 10, 15, 20, 25, 30, 35],
+              'weights': ['uniform', 'distance']}
+    KNN_cv = RandomizedSearchCV(estimator=KNN, param_distributions=params, n_iter=5, scoring='f1_weighted')
+    return KNN_cv
 
-    
-    
+def gradient_boosting():
+    gbr = GradientBoostingClassifier()
+    params = {'n_estimators': [25, 50, 75, 100, 150, 200],
+              'loss': ['deviance']}
+    gbr_cv = RandomizedSearchCV(estimator=gbr, param_distributions=params, n_iter=5, scoring='f1_weighted')
+    return gbr_cv
