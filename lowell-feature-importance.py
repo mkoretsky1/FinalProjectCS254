@@ -51,7 +51,8 @@ gbr_cv.fit(X_train, y_train)
 clf_gbr = OneVsRestClassifier(estimator=gbr_cv)
 clf_gbr.fit(X_train, y_train)
 
-
+#do the same for logistic regression
+lr_cv = model_setup.logisd
 
 for i in range(4):
     # print which method it is
@@ -74,6 +75,8 @@ for i in range(4):
                                           columns=["importance"]).sort_values('importance', ascending=False)
 
     print(feature_importances_gbr.head(10))
+
+
 
 
 
