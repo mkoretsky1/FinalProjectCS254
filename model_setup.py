@@ -5,6 +5,9 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split, GridSearchCV, RandomizedSearchCV
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 
 def set_up():
     nypd = pd.read_csv('nypd_data/nypd_10000.csv', parse_dates=['complaint_datetime'])
@@ -53,8 +56,23 @@ def k_nearest_neighbors():
     return KNN_cv
 
 def gradient_boosting():
-    gbr = GradientBoostingClassifier()
+    gbc = GradientBoostingClassifier()
     params = {'n_estimators': [25, 50, 75, 100, 150, 200],
               'loss': ['deviance']}
-    gbr_cv = RandomizedSearchCV(estimator=gbr, param_distributions=params, n_iter=5, scoring='f1_weighted')
-    return gbr_cv
+    gbc_cv = RandomizedSearchCV(estimator=gbc, param_distributions=params, n_iter=5, scoring='f1_weighted')
+    return gbc_cv
+
+def support_vector():
+    svc = SVC()
+    params = {'C':[0.01,0.05,0.1,0.15,1.0], 'gamma':[1e-5,0.001,0.01,0.1,1,10]}
+    svc_cv = RandomizedSearchCV(estimator=svc, param_distributions=params, n_iter=5, scoring='f1_weighted')
+    return svc_cv
+
+def log_reg():
+    log_reg = LogisticRegressionCV(Cs=[0.001,0.01,0.05,0.1,0.5], random_state=10, cv=5, 
+                                   penalty='l1', solver='saga', scoring='brier_score_loss')
+    return log_reg
+    
+    
+    
+    
