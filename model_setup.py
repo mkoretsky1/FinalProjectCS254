@@ -2,6 +2,7 @@
 
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split, GridSearchCV, RandomizedSearchCV
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
@@ -15,8 +16,7 @@ def set_up():
     # Variables to drop regardless of the analysis
     drop_always = ['CMPLNT_NUM','SUSP_RACE','SUSP_SEX','VIC_SEX','complaint_datetime','Unnamed: 0']
     # Variables to drop when performing classification for location
-    drop_for_location_analysis = ['Latitude','Longitude','boro_BRONX','boro_BROOKLYN','boro_MANHATTAN',
-                                  'boro_QUEENS','boro_STATEN ISLAND']
+    drop_for_location_analysis = ['Latitude','Longitude']
     # Creating one list of variables to drop - Edit this line based on analysis being performed
     drop = drop_always + drop_for_location_analysis
     nypd = nypd.drop(drop, axis=1)
@@ -70,7 +70,7 @@ def support_vector():
 
 def log_reg():
     log_reg = LogisticRegressionCV(Cs=[0.001,0.01,0.05,0.1,0.5], random_state=10, cv=5, 
-                                   penalty='l1', solver='saga', scoring='brier_score_loss')
+                                   scoring='f1_weighted')
     return log_reg
     
     
