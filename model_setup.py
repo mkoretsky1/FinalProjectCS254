@@ -2,9 +2,13 @@
 
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split, GridSearchCV, RandomizedSearchCV
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 
 def set_up():
     nypd = pd.read_csv('nypd_data/nypd_10000.csv', parse_dates=['complaint_datetime'])
@@ -12,8 +16,7 @@ def set_up():
     # Variables to drop regardless of the analysis
     drop_always = ['CMPLNT_NUM','SUSP_RACE','SUSP_SEX','VIC_SEX','complaint_datetime','Unnamed: 0']
     # Variables to drop when performing classification for location
-    drop_for_location_analysis = ['Latitude','Longitude','boro_BRONX','boro_BROOKLYN','boro_MANHATTAN',
-                                  'boro_QUEENS','boro_STATEN ISLAND']
+    drop_for_location_analysis = ['Latitude','Longitude']
     # Creating one list of variables to drop - Edit this line based on analysis being performed
     drop = drop_always + drop_for_location_analysis
     nypd = nypd.drop(drop, axis=1)
@@ -53,8 +56,23 @@ def k_nearest_neighbors():
     return KNN_cv
 
 def gradient_boosting():
-    gbr = GradientBoostingClassifier()
+    gbc = GradientBoostingClassifier()
     params = {'n_estimators': [25, 50, 75, 100, 150, 200],
               'loss': ['deviance']}
-    gbr_cv = RandomizedSearchCV(estimator=gbr, param_distributions=params, n_iter=5, scoring='f1_weighted')
-    return gbr_cv
+    gbc_cv = RandomizedSearchCV(estimator=gbc, param_distributions=params, n_iter=5, scoring='f1_weighted')
+    return gbc_cv
+
+def support_vector():
+    svc = SVC()
+    params = {'C':[0.01,0.05,0.1,0.15,1.0], 'gamma':[1e-5,0.001,0.01,0.1,1,10]}
+    svc_cv = RandomizedSearchCV(estimator=svc, param_distributions=params, n_iter=5, scoring='f1_weighted')
+    return svc_cv
+
+def log_reg():
+    log_reg = LogisticRegressionCV(Cs=[0.001,0.01,0.05,0.1,0.5], random_state=10, cv=5, 
+                                   scoring='f1_weighted')
+    return log_reg
+    
+    
+    
+    
