@@ -71,7 +71,7 @@ for i in range(4):
     print(feature_importances_rf.head(10))
 
     plt.pyplot.barh(feature_importances_rf.head(10).index, feature_importances_rf.head(10)['importance'])
-    plt.pyplot.title('feature importance for ' + clf_rf.classes_[i])
+    plt.pyplot.title('Random Forest feature importance for ' + clf_rf.classes_[i])
     plt.pyplot.xlabel('importance')
     plt.pyplot.show()
 
@@ -88,7 +88,7 @@ for i in range(4):
 
 
     plt.pyplot.barh(feature_importances_gbr.head(10).index, feature_importances_gbr.head(10)['importance'])
-    plt.pyplot.title('feature importance for ' + clf_gbr.classes_[i])
+    plt.pyplot.title('Gradient Boosting feature importance for ' + clf_gbr.classes_[i])
     plt.pyplot.xlabel('importance')
     plt.pyplot.show()
 
@@ -104,7 +104,7 @@ for i in range(4):
     print(feature_importances_lr.head(10))
 
     plt.pyplot.barh(feature_importances_lr.head(10).index, feature_importances_lr.head(10)['importance'])
-    plt.pyplot.title('feature importance for ' + clf_rf.classes_[i])
+    plt.pyplot.title('Logistic Regression feature importance for ' + clf_rf.classes_[i])
     plt.pyplot.xlabel('importance')
     plt.pyplot.show()
 
