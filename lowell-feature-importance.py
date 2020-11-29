@@ -24,6 +24,7 @@ print(len(nypd))
 
 # Getting rid of Staten Island
 nypd_no_stat = nypd[nypd.BORO_NM != 'STATEN ISLAND']
+nypd_no_stat = nypd.drop(["boro_BRONX","boro_BROOKLYN","boro_QUEENS","boro_MANHATTAN", "boro_STATEN ISLAND"], axis = 1)
 
 # Splitting data
 X_train, X_test, y_train, y_test = model_setup.split_data(nypd_no_stat)
@@ -36,7 +37,6 @@ X_train, y_train = tl.fit_resample(X_train, y_train)
 
 # Random forest
 rf_cv = model_setup.random_forest()
-
 rf_cv.fit(X_train, y_train)
 
 # One vs rest classifier for testing
@@ -51,7 +51,13 @@ gbr_cv.fit(X_train, y_train)
 clf_gbr = OneVsRestClassifier(estimator=gbr_cv)
 clf_gbr.fit(X_train, y_train)
 
+#do the same for logistic regression
+lr_cv = model_setup.log_reg()
+lr_cv.fit(X_train, y_train)
 
+# One vs rest classifier for testing
+clf_lr = OneVsRestClassifier(estimator=gbr_cv)
+clf_lr.fit(X_train, y_train)
 
 for i in range(4):
     # print which method it is
@@ -64,6 +70,11 @@ for i in range(4):
 
     print(feature_importances_rf.head(10))
 
+    plt.pyplot.barh(feature_importances_rf.head(10).index, feature_importances_rf.head(10)['importance'])
+    plt.pyplot.title('feature importance for ' + clf_rf.classes_[i])
+    plt.pyplot.xlabel('importance')
+    plt.pyplot.show()
+
     # print which method it is
 
     print("Gradient Boosting \n")
@@ -74,6 +85,30 @@ for i in range(4):
                                           columns=["importance"]).sort_values('importance', ascending=False)
 
     print(feature_importances_gbr.head(10))
+
+
+    plt.pyplot.barh(feature_importances_gbr.head(10).index, feature_importances_gbr.head(10)['importance'])
+    plt.pyplot.title('feature importance for ' + clf_gbr.classes_[i])
+    plt.pyplot.xlabel('importance')
+    plt.pyplot.show()
+
+    # print which method it is
+
+    print("Logistic Regression \n")
+    print("Feature importance for ", clf_lr.classes_[i], "\n")
+
+    feature_importances_lr = pd.DataFrame(clf_lr.estimators_[i].best_estimator_.feature_importances_,
+                                          index=X_test.columns,
+                                          columns=["importance"]).sort_values('importance', ascending=False)
+
+    print(feature_importances_lr.head(10))
+
+    plt.pyplot.barh(feature_importances_lr.head(10).index, feature_importances_lr.head(10)['importance'])
+    plt.pyplot.title('feature importance for ' + clf_rf.classes_[i])
+    plt.pyplot.xlabel('importance')
+    plt.pyplot.show()
+
+
 
 
 
