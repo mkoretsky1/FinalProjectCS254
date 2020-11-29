@@ -70,9 +70,10 @@ for i in range(4):
 
     print(feature_importances_rf.head(10))
 
-    plt.pyplot.barh(feature_importances_rf.head(10)['importance'],width = 0.5)
-    plt.pyplot.title('feature importance for ', clf_rf.classes_[i])
+    plt.pyplot.barh(feature_importances_rf.head(10).index, feature_importances_rf.head(10)['importance'])
+    plt.pyplot.title('feature importance for ' + clf_rf.classes_[i])
     plt.pyplot.xlabel('importance')
+    plt.pyplot.show()
 
     # print which method it is
 
@@ -85,14 +86,16 @@ for i in range(4):
 
     print(feature_importances_gbr.head(10))
 
-    plt.pyplot.barh(feature_importances_gbr.head(10)['importance'],width = 0.5)
-    plt.pyplot.title('feature importance for ', clf_gbr.classes_[i])
+
+    plt.pyplot.barh(feature_importances_gbr.head(10).index, feature_importances_gbr.head(10)['importance'])
+    plt.pyplot.title('feature importance for ' + clf_gbr.classes_[i])
     plt.pyplot.xlabel('importance')
+    plt.pyplot.show()
 
     # print which method it is
 
     print("Logistic Regression \n")
-    print("Feature importance for the ", clf_lr.classes_[i], "\n")
+    print("Feature importance for ", clf_lr.classes_[i], "\n")
 
     feature_importances_lr = pd.DataFrame(clf_lr.estimators_[i].best_estimator_.feature_importances_,
                                           index=X_test.columns,
@@ -100,9 +103,10 @@ for i in range(4):
 
     print(feature_importances_lr.head(10))
 
-    plt.pyplot.barh(feature_importances_lr.head(10)['importance'],width = 0.5)
-    plt.pyplot.title('feature importance for ', clf_rf.classes_[i])
+    plt.pyplot.barh(feature_importances_lr.head(10).index, feature_importances_lr.head(10)['importance'])
+    plt.pyplot.title('feature importance for ' + clf_rf.classes_[i])
     plt.pyplot.xlabel('importance')
+    plt.pyplot.show()
 
 
 
