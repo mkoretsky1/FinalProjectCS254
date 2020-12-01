@@ -27,6 +27,9 @@ X = nypd_no_stat.drop(['BORO_NUM'], axis=1)
 # Splitting data
 X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.80)
 
+# Standardizing
+X_train, X_test = model_setup.standardize(X_train, X_test)
+
 # One-hot encoding
 num_classes = 4
 y_train = to_categorical(y_train, num_classes)
@@ -43,11 +46,12 @@ print(y_test[0])
 
 # MLP model
 model = Sequential()
-model.add(layers.Dense(100, input_shape=(471,), activation='relu'))
-model.add(layers.Dense(100, activation='relu'))
+model.add(layers.Dense(100, input_shape=(471,), activation='tanh'))
+model.add(layers.LeakyReLU())
+model.add(layers.LeakyReLU())
 model.add(layers.Dense(100, activation='relu'))
 model.add(layers.Dense(4, activation='softmax'))
-opt = optimizers.SGD(learning_rate=0.1)
+opt = optimizers.SGD(learning_rate=0.01)
 model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
-model.fit(X_train, y_train, epochs=10)
+model.fit(X_train, y_train, epochs=10, batch_size=16)
 model.evaluate(X_test, y_test)
