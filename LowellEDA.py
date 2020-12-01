@@ -19,7 +19,7 @@ print(nypd.info())
 #here we can see the name of the columns
 print(nypd.columns)
 
-#here we get the value counts of the suspects race and see a majority of black
+#bar plot of the distributions of races by borough
 N = 6
 
 bronx_dist =nypd[nypd.BORO_NM == "BRONX"]['VIC_RACE'].value_counts().sort_index()
@@ -52,6 +52,24 @@ plt.title('Suspect Race by Borough')
 plt.xticks(ind + width / 2, ('UNKNOWN', 'ASIAN / PACIFIC ISLANDER', 'BLACK', 'BLACK HISPANIC', 'WHITE', 'WHITE HISPANIC'))
 plt.legend(loc='best')
 plt.show()
+
+#bar plot of the distribution of boroughs
+
+
+x = ['Brooklyn', 'Manhattan', 'Bronx', 'Queens', 'Staten Island']
+boro_dist =nypd['BORO_NM'].value_counts()
+
+x_pos = [i for i, _ in enumerate(x)]
+
+plt.bar(x_pos, boro_dist, color='green')
+plt.xlabel("New York City Borough")
+plt.ylabel("Crime Count")
+plt.title("Distribution of Crime Across NYC Boroughs")
+
+plt.xticks(x_pos, x)
+
+plt.show()
+
 
 # if race == 'AMERICAN INDIAN/ALAKAN NATIVE':
 #     return 1
