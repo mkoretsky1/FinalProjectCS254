@@ -14,7 +14,7 @@ def set_up():
     nypd = pd.read_csv('nypd_data/nypd_10000.csv', parse_dates=['complaint_datetime'])
     # Getting X data
     # Variables to drop regardless of the analysis
-    drop_always = ['CMPLNT_NUM','SUSP_RACE','SUSP_SEX','VIC_SEX','complaint_datetime','Unnamed: 0']
+    drop_always = ['CMPLNT_NUM','SUSP_RACE','SUSP_SEX','VIC_SEX','complaint_datetime','Unnamed: 0','Unnamed: 0.1']
     # Variables to drop when performing classification for location
     drop_for_location_analysis = ['Latitude','Longitude']
     # Creating one list of variables to drop - Edit this line based on analysis being performed

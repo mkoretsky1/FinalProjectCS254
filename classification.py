@@ -7,9 +7,7 @@ import matplotlib.pyplot as plt
 import model_setup
 from sklearn.metrics import plot_confusion_matrix
 from sklearn.metrics import accuracy_score, auc, confusion_matrix, classification_report
-from sklearn.multiclass import OneVsRestClassifier
-
-### Functions ###
+from sklearn.multiclass import OneVsRestClassifier  
 
 ### Main ###
 # Setting up model
@@ -22,10 +20,15 @@ print(len(nypd_no_staten))
 
 # Splitting and standardizing data
 X_train, X_test, y_train, y_test = model_setup.split_data(nypd)
+colnames = X_train.columns
 X_train, X_test = model_setup.standardize(X_train, X_test)
 
-# Getting model
+X = pd.DataFrame(X_train)
+
+
+# Getting model - makes this easy to switch out
 model = model_setup.random_forest()
+model_name = 'Random Forest' # good for plotting
 
 # Fitting model
 model.fit(X_train, y_train)
@@ -55,4 +58,15 @@ for i in range(len(ovr.estimators_)):
     print(ovr.estimators_[i].best_params_)
     
 # Looking at feature importances for the ovr models
-
+for i in range(len(ovr.estimators_)):
+    feature_importances = pd.DataFrame(ovr.estimators_[i].best_estimator_.feature_importances_, index=colnames,
+                                          columns=["importance"]).sort_values('importance', ascending = False)
+    
+    print(model_name + 'Feature Importances for ' + ovr.classes_[i])
+    print(feature_importances.head(10))
+    plt.barh(feature_importances.head(10).index, feature_importances.head(10)['importance'])
+    plt.gca().invert_yaxis()
+    plt.grid(True, which='major', axis='both')
+    plt.title(model_name + 'Feature Importance for ' + ovr.classes_[i])
+    plt.xlabel('importance')
+    plt.show()
