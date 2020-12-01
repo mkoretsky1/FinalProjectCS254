@@ -62,11 +62,11 @@ for i in range(len(ovr.estimators_)):
     feature_importances = pd.DataFrame(ovr.estimators_[i].best_estimator_.feature_importances_, index=colnames,
                                           columns=["importance"]).sort_values('importance', ascending = False)
     
-    print(model_name + 'Feature Importances for ' + ovr.classes_[i])
+    print(model_name + ' Feature Importances for ' + ovr.classes_[i])
     print(feature_importances.head(10))
     plt.barh(feature_importances.head(10).index, feature_importances.head(10)['importance'])
     plt.gca().invert_yaxis()
     plt.grid(True, which='major', axis='both')
-    plt.title(model_name + 'Feature Importance for ' + ovr.classes_[i])
+    plt.title(model_name + ' Feature Importance for ' + ovr.classes_[i])
     plt.xlabel('importance')
     plt.show()
