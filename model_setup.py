@@ -11,7 +11,7 @@ from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 
 def set_up():
-    nypd = pd.read_csv('nypd_data/nypd_10000.csv', parse_dates=['complaint_datetime'])
+    nypd = pd.read_csv('nypd_data/nypd_100000.csv', parse_dates=['complaint_datetime'])
     # Getting X data
     # Variables to drop regardless of the analysis
     drop_always = ['CMPLNT_NUM','SUSP_RACE','SUSP_SEX','VIC_SEX','complaint_datetime','Unnamed: 0','Unnamed: 0.1']
