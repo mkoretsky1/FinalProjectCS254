@@ -7,6 +7,7 @@ from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.models import Sequential
 from tensorflow.keras import layers
 from tensorflow.keras import optimizers
+from tensorflow.keras import initializers
 from sklearn.model_selection import train_test_split
 
 ### Main ###
@@ -25,7 +26,7 @@ y = nypd_no_stat['BORO_NUM'].values
 X = nypd_no_stat.drop(['BORO_NUM'], axis=1)
 
 # Splitting data
-X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.80)
+X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.80, random_state=10)
 
 # Standardizing
 X_train, X_test = model_setup.standardize(X_train, X_test)
@@ -46,12 +47,11 @@ print(y_test[0])
 
 # MLP model
 model = Sequential()
-model.add(layers.Dense(100, input_shape=(471,), activation='tanh'))
-model.add(layers.LeakyReLU())
-model.add(layers.LeakyReLU())
-model.add(layers.Dense(100, activation='relu'))
+model.add(layers.Dense(500, input_shape=(471,), activation='tanh'))
+model.add(layers.Dense(500, input_shape=(471,), activation='relu'))
+model.add(layers.Dense(500, input_shape=(471,), activation='relu'))
 model.add(layers.Dense(4, activation='softmax'))
 opt = optimizers.SGD(learning_rate=0.01)
-model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
-model.fit(X_train, y_train, epochs=10, batch_size=16)
+model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy','Precision'])
+model.fit(X_train, y_train, epochs=10, batch_size=1000, validation_split=0.1)
 model.evaluate(X_test, y_test)

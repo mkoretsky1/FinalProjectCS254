@@ -11,10 +11,14 @@ from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 
 def set_up():
-    nypd = pd.read_csv('nypd_data/nypd_100000.csv', parse_dates=['complaint_datetime'])
+    file_name = 'nypd_data/nypd_100000.csv'
+    nypd = pd.read_csv(file_name, parse_dates=['complaint_datetime'])
     # Getting X data
     # Variables to drop regardless of the analysis
-    drop_always = ['CMPLNT_NUM','SUSP_RACE','SUSP_SEX','VIC_SEX','complaint_datetime','Unnamed: 0','Unnamed: 0.1']
+    if file_name == 'nypd_data/nypd.csv':
+        drop_always = ['CMPLNT_NUM','SUSP_RACE','SUSP_SEX','VIC_SEX','complaint_datetime','Unnamed: 0']
+    else:
+        drop_always = ['CMPLNT_NUM','SUSP_RACE','SUSP_SEX','VIC_SEX','complaint_datetime','Unnamed: 0','Unnamed: 0.1']
     # Variables to drop when performing classification for location
     drop_for_location_analysis = ['Latitude','Longitude']
     # Creating one list of variables to drop - Edit this line based on analysis being performed

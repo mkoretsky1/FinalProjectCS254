@@ -15,8 +15,8 @@ nypd = model_setup.set_up()
 print(len(nypd))
 
 # Dropping Staten Island (separate df for easy use)
-nypd_no_staten = nypd[nypd.BORO_NM != 'STATEN ISLAND']
-print(len(nypd_no_staten))
+nypd = nypd[nypd.BORO_NM != 'STATEN ISLAND']
+print(len(nypd))
 
 # Splitting and standardizing data
 X_train, X_test, y_train, y_test = model_setup.split_data(nypd)
@@ -61,7 +61,7 @@ for i in range(len(ovr.estimators_)):
 for i in range(len(ovr.estimators_)):
     feature_importances = pd.DataFrame(ovr.estimators_[i].best_estimator_.feature_importances_, index=colnames,
                                           columns=["importance"]).sort_values('importance', ascending = False)
-    
+    figure_name = 'figures/' + model_name + '_feature_importance_' + ovr.classes_[i] + '.png'
     print(model_name + ' Feature Importances for ' + ovr.classes_[i])
     print(feature_importances.head(10))
     plt.barh(feature_importances.head(10).index, feature_importances.head(10)['importance'])
@@ -69,4 +69,5 @@ for i in range(len(ovr.estimators_)):
     plt.grid(True, which='major', axis='both')
     plt.title(model_name + ' Feature Importance for ' + ovr.classes_[i])
     plt.xlabel('importance')
+    #plt.savefig(figure_name)
     plt.show()
