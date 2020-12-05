@@ -220,6 +220,7 @@ brooklyn_dist = nypd[nypd.BORO_NM == "BROOKLYN"]["off_granular_MARIJUANA, POSSES
 
 manhattan_dist = nypd[nypd.BORO_NM == "MANHATTAN"]["off_granular_MARIJUANA, POSSESSION 4 & 5"].sum()
 
+print(brooklyn_dist)
 print(queens_dist)
 print(bronx_dist)
 print(manhattan_dist)
