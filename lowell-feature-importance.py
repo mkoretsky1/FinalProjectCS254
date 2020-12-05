@@ -24,7 +24,7 @@ print(len(nypd))
 
 # Getting rid of Staten Island
 nypd_no_stat = nypd[nypd.BORO_NM != 'STATEN ISLAND']
-nypd_no_stat = nypd.drop(["boro_BRONX","boro_BROOKLYN","boro_QUEENS","boro_MANHATTAN", "boro_STATEN ISLAND"], axis = 1)
+#nypd_no_stat = nypd.drop(["boro_BRONX","boro_BROOKLYN","boro_QUEENS","boro_MANHATTAN", "boro_STATEN ISLAND"], axis = 1)
 
 # Splitting data
 X_train, X_test, y_train, y_test = model_setup.split_data(nypd_no_stat)
@@ -42,6 +42,8 @@ rf_cv.fit(X_train, y_train)
 # One vs rest classifier for testing
 clf_rf = OneVsRestClassifier(estimator=rf_cv)
 clf_rf.fit(X_train, y_train)
+pred = clf_rf.predict(X_test)
+print(classification_report(y_test, pred))
 
 #do the same for gradient boosting
 gbr_cv = model_setup.gradient_boosting()
@@ -50,6 +52,8 @@ gbr_cv.fit(X_train, y_train)
 # One vs rest classifier for testing
 clf_gbr = OneVsRestClassifier(estimator=gbr_cv)
 clf_gbr.fit(X_train, y_train)
+pred = clf_gbr.predict(X_test)
+print(classification_report(y_test, pred))
 
 #do the same for logistic regression
 lr_cv = model_setup.log_reg()
@@ -58,6 +62,8 @@ lr_cv.fit(X_train, y_train)
 # One vs rest classifier for testing
 clf_lr = OneVsRestClassifier(estimator=gbr_cv)
 clf_lr.fit(X_train, y_train)
+pred = clf_lr.predict(X_test)
+print(classification_report(y_test, pred))
 
 for i in range(4):
     # print which method it is
