@@ -14,7 +14,7 @@ from sklearn.multiclass import OneVsRestClassifier
 nypd = model_setup.set_up()
 print(len(nypd))
 
-# Dropping Staten Island (separate df for easy use)
+# Dropping Staten Island
 nypd = nypd[nypd.BORO_NM != 'STATEN ISLAND']
 print(len(nypd))
 
