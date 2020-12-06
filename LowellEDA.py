@@ -19,6 +19,30 @@ print(nypd.info())
 #here we can see the name of the columns
 print(nypd.columns)
 
+#lets try looking at the split of the boros with PCA
+#transform the data to two components
+# clf = PCA(n_components=2)
+# transformed_data = clf.fit_transform(X_train)
+#
+# #create a scatter plot with different colors for different clases of data-points
+# class_0 = np.where(y_train == "BRONX")
+# class_1 = np.where(y_train == "BROOKLYN")
+# class_2 = np.where(y_train == "QUEENS")
+# class_3 = np.where(y_train == "STATEN ISLAND")
+# class_4 = np.where(y_train == "MANHATTAN")
+#
+# # plotting of transformed data by class
+# fig, ax = plt.subplots(figsize=(10, 8))
+# plt.scatter(transformed_data[:, 0][class_0], transformed_data[:, 1][class_0], label = "Bronx")
+# plt.scatter(transformed_data[:, 0][class_1], transformed_data[:, 1][class_1], label = "Brooklyn")
+# plt.scatter(transformed_data[:, 0][class_2], transformed_data[:, 1][class_2], label = "Queens" )
+# plt.scatter(transformed_data[:, 0][class_3], transformed_data[:, 1][class_3], label = "Staten Island ")
+# plt.scatter(transformed_data[:, 0][class_4], transformed_data[:, 1][class_4], label = "Manhatten")
+# plt.legend()
+# plt.xlabel("Principal Component 1")
+# plt.ylabel("Principal Component 2")
+# plt.show()
+
 #bar plot of the distributions of races by borough
 N = 6
 
@@ -70,33 +94,150 @@ plt.xticks(x_pos, x)
 
 plt.show()
 
+#IMPORTANT FEATURES FROM FEATURE IMPORTANCE
 
-# if race == 'AMERICAN INDIAN/ALAKAN NATIVE':
-#     return 1
-# elif race == 'ASIAN / PACIFIC ISLANDER' or race == 'ASIAN/PACIFIC ISLANDER':
-#     return 2
-# elif race == 'BLACK':
-#     return 3
-# elif race == 'BLACK HISPANIC':
-#     return 4
-# elif race == 'UNKNOWN':
-#     return 0
-# elif race == 'WHITE':
-#     return 5
-# elif race == 'WHITE HISPANIC':
-#     return 6
+#BRONX: off_granular_WEAPONS, POSSESSION, ETC
 
-#might need to make a key for the three digit offense clarrification code
-#print(df['KY_CD'].value_counts())
-#would be hard to make a key but this could a good feature
+#BROOKLYN: off_granular_ROBBERY,OPEN AREA UNCLASSIFIED
 
-#need to check if PD_DESC is too variable
-#print(df['PD_DESC'].value_counts())
-#231 unique values so not bad could be used but would create 231 new features which is alot
+#MANHATTAN: off_granular_LARCENY,GRAND FROM BUILDING (NON-RESIDENCE) UNATTENDED, off_GRAND LARCENY
+
+#QUEENS: off_granular_MARIJUANA, POSSESSION 4 & 5, off_granular_LARCENY,GRAND OF AUTO
+
+#bar plot of the distributions of important crime features by borough
+
+#BRONX
+bronx_dist =nypd[nypd.BORO_NM == "BRONX"]["off_granular_WEAPONS, POSSESSION, ETC"].sum()
+
+queens_dist = nypd[nypd.BORO_NM == "QUEENS"]["off_granular_WEAPONS, POSSESSION, ETC"].sum()
+
+brooklyn_dist = nypd[nypd.BORO_NM == "BROOKLYN"]["off_granular_WEAPONS, POSSESSION, ETC"].sum()
+
+manhattan_dist = nypd[nypd.BORO_NM == "MANHATTAN"]["off_granular_WEAPONS, POSSESSION, ETC"].sum()
+
+print(brooklyn_dist)
+print(queens_dist)
+print(bronx_dist)
+print(manhattan_dist)
+x = ['Bronx', 'Queens', 'Brooklyn', 'Manhattan']
+x_pos = [i for i, _ in enumerate(x)]
+nyc_dist = [bronx_dist, queens_dist, brooklyn_dist, manhattan_dist]
+
+plt.bar(x_pos, nyc_dist, color='green')
+plt.xticks(x_pos, x)
+plt.ylabel('Crime Count')
+plt.xlabel("New York City Borough")
+plt.title('Bronx Important Feature: Weapon Possession Calls')
+
+plt.show()
+
+#BROOKLYN
+
+bronx_dist =nypd[nypd.BORO_NM == "BRONX"]["off_granular_ROBBERY,OPEN AREA UNCLASSIFIED"].sum()
+
+queens_dist = nypd[nypd.BORO_NM == "QUEENS"]["off_granular_ROBBERY,OPEN AREA UNCLASSIFIED"].sum()
+
+brooklyn_dist = nypd[nypd.BORO_NM == "BROOKLYN"]["off_granular_ROBBERY,OPEN AREA UNCLASSIFIED"].sum()
+
+manhattan_dist = nypd[nypd.BORO_NM == "MANHATTAN"]["off_granular_ROBBERY,OPEN AREA UNCLASSIFIED"].sum()
+
+print(brooklyn_dist)
+print(queens_dist)
+print(bronx_dist)
+print(manhattan_dist)
+x = ['Bronx', 'Queens', 'Brooklyn', 'Manhattan']
+x_pos = [i for i, _ in enumerate(x)]
+nyc_dist = [bronx_dist, queens_dist, brooklyn_dist, manhattan_dist]
+
+plt.bar(x_pos, nyc_dist, color='green')
+plt.xticks(x_pos, x)
+plt.ylabel('Crime Count')
+plt.xlabel("New York City Borough")
+plt.title('Brooklyn Important Feature: Robbery in Open Area')
+
+plt.show()
+
+#MANHATTAN
+
+bronx_dist =nypd[nypd.BORO_NM == "BRONX"]["off_granular_LARCENY,GRAND FROM BUILDING (NON-RESIDENCE) UNATTENDED"].sum()
+
+queens_dist = nypd[nypd.BORO_NM == "QUEENS"]["off_granular_LARCENY,GRAND FROM BUILDING (NON-RESIDENCE) UNATTENDED"].sum()
+
+brooklyn_dist = nypd[nypd.BORO_NM == "BROOKLYN"]["off_granular_LARCENY,GRAND FROM BUILDING (NON-RESIDENCE) UNATTENDED"].sum()
+
+manhattan_dist = nypd[nypd.BORO_NM == "MANHATTAN"]["off_granular_LARCENY,GRAND FROM BUILDING (NON-RESIDENCE) UNATTENDED"].sum()
+
+print(brooklyn_dist)
+print(queens_dist)
+print(bronx_dist)
+print(manhattan_dist)
+x = ['Bronx', 'Queens', 'Brooklyn', 'Manhattan']
+x_pos = [i for i, _ in enumerate(x)]
+nyc_dist = [bronx_dist, queens_dist, brooklyn_dist, manhattan_dist]
+
+plt.bar(x_pos, nyc_dist, color='green')
+plt.xticks(x_pos, x)
+plt.ylabel('Crime Count')
+plt.xlabel("New York City Borough")
+plt.title('Manhattan Important Feature: Grand Larceny From Unattended Building')
+
+plt.show()
+
+#MANHATTAN
+
+bronx_dist =nypd[nypd.BORO_NM == "BRONX"]["off_GRAND LARCENY"].sum()
+
+queens_dist = nypd[nypd.BORO_NM == "QUEENS"]["off_GRAND LARCENY"].sum()
+
+brooklyn_dist = nypd[nypd.BORO_NM == "BROOKLYN"]["off_GRAND LARCENY"].sum()
+
+manhattan_dist = nypd[nypd.BORO_NM == "MANHATTAN"]["off_GRAND LARCENY"].sum()
+
+print(brooklyn_dist)
+print(queens_dist)
+print(bronx_dist)
+print(manhattan_dist)
+x = ['Bronx', 'Queens', 'Brooklyn', 'Manhattan']
+x_pos = [i for i, _ in enumerate(x)]
+nyc_dist = [bronx_dist, queens_dist, brooklyn_dist, manhattan_dist]
+
+plt.bar(x_pos, nyc_dist, color='green')
+plt.xticks(x_pos, x)
+plt.ylabel('Crime Count')
+plt.xlabel("New York City Borough")
+plt.title('Manhattan Important Feature: Grand Larceny')
+
+plt.show()
 
 
-#level of offense(LAW_CAT_CD) will probably be useful. maybe more useful than crime description
-#print(df['LAW_CAT_CD'].value_counts()) #will make one hot encoding of this
+#QUEENS
+
+bronx_dist =nypd[nypd.BORO_NM == "BRONX"]["off_granular_MARIJUANA, POSSESSION 4 & 5"].sum()
+
+queens_dist = nypd[nypd.BORO_NM == "QUEENS"]["off_granular_MARIJUANA, POSSESSION 4 & 5"].sum()
+
+brooklyn_dist = nypd[nypd.BORO_NM == "BROOKLYN"]["off_granular_MARIJUANA, POSSESSION 4 & 5"].sum()
+
+manhattan_dist = nypd[nypd.BORO_NM == "MANHATTAN"]["off_granular_MARIJUANA, POSSESSION 4 & 5"].sum()
+
+print(brooklyn_dist)
+print(queens_dist)
+print(bronx_dist)
+print(manhattan_dist)
+x = ['Bronx', 'Queens', 'Brooklyn', 'Manhattan']
+x_pos = [i for i, _ in enumerate(x)]
+nyc_dist = [bronx_dist, queens_dist, brooklyn_dist, manhattan_dist]
+
+plt.bar(x_pos, nyc_dist, color='green')
+plt.xticks(x_pos, x)
+plt.ylabel('Crime Count')
+plt.xlabel("New York City Borough")
+plt.title('Queens Important Feature: Marijuana Possession')
+
+plt.show()
+
+
+
 
 
 
