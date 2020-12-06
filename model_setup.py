@@ -11,7 +11,7 @@ from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 
 def set_up():
-    file_name = 'nypd_data/nypd_1000000.csv'
+    file_name = 'nypd_data/nypd_100000.csv'
     nypd = pd.read_csv(file_name, parse_dates=['complaint_datetime'])
     # Getting X data
     # Variables to drop regardless of the analysis
@@ -47,9 +47,9 @@ def standardize(X_train, X_test):
 
 def random_forest():
     rf = RandomForestClassifier(class_weight='balanced')
-    params = {'n_estimators':[25,50,75,100,150,200], 'max_depth':[2,3,4,5,6,7,8,9,10],
-              'max_features':['sqrt','log2',25,50,75,100]}
-    rf_cv = RandomizedSearchCV(estimator=rf, param_distributions=params, n_iter=5)
+    params = {'n_estimators':[25,50,75,100,150,200,250], 'max_depth':[5,6,7,8,9,10,11,12,13,14,15],
+              'max_features':[25,50,75,100]}
+    rf_cv = RandomizedSearchCV(estimator=rf, param_distributions=params, n_iter=5, scoring='f1_weighted')
     return rf_cv
 
 def k_nearest_neighbors():
@@ -73,9 +73,10 @@ def support_vector():
     return svc_cv
 
 def log_reg():
-    log_reg = LogisticRegressionCV(Cs=[0.001,0.01,0.05,0.1,0.5], random_state=10, cv=5, 
-                                   scoring='f1_weighted')
-    return log_reg
+    log_reg = LogisticRegression(max_iter=200)
+    params = {'C':[0.01,0.05,0.1,0.5,1,5,10]}
+    log_reg_cv = RandomizedSearchCV(estimator=log_reg, param_distributions=params, n_iter=5, scoring='f1_weighted')
+    return log_reg_cv
     
     
     

@@ -3,12 +3,27 @@
 import tensorflow as tf
 import pandas as pd
 import model_setup
+from tensorflow.keras import backend as K
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.models import Sequential
 from tensorflow.keras import layers
 from tensorflow.keras import optimizers
+from tensorflow.keras import regularizers
 from tensorflow.keras import initializers
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report, accuracy_score
+import matplotlib.pyplot as plt
+import warnings
+warnings.filterwarnings("ignore")
+
+def plot_learning_curve(history):
+    plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
+    plt.title('model loss')
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.legend(['training', 'validation'], loc='upper left')
+    plt.show()
 
 ### Main ###
 # Setting up
@@ -47,11 +62,15 @@ print(y_test[0])
 
 # MLP model
 model = Sequential()
-model.add(layers.Dense(500, input_shape=(471,), activation='tanh'))
-model.add(layers.Dense(500, input_shape=(471,), activation='relu'))
-model.add(layers.Dense(500, input_shape=(471,), activation='relu'))
+model.add(layers.LeakyReLU(32, input_shape=(471,)))
 model.add(layers.Dense(4, activation='softmax'))
-opt = optimizers.SGD(learning_rate=0.01)
-model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy','Precision'])
-model.fit(X_train, y_train, epochs=10, batch_size=1000, validation_split=0.1)
-model.evaluate(X_test, y_test)
+opt = optimizers.SGD(learning_rate=0.001, momentum=0.5)
+#opt = optimizers.Adagrad(learning_rate=0.001)
+#opt = optimizers.RMSprop(learning_rate=0.0001, momentum=0.9, centered=True)
+#opt = optimizers.Adam(learning_rate=0.001)
+model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy','Precision','Recall'])
+hist = model.fit(X_train, y_train, epochs=10, validation_split=0.2, batch_size=100)
+loss, accuracy, precision, recall = model.evaluate(X_test, y_test)
+f1 = 2*((precision*recall)/(precision+recall))
+print(f1)
+plot_learning_curve(hist)
