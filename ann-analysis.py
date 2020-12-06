@@ -11,6 +11,7 @@ from tensorflow.keras import optimizers
 from tensorflow.keras import regularizers
 from tensorflow.keras import initializers
 from sklearn.model_selection import train_test_split
+from sklearn.decomposition import PCA
 from sklearn.metrics import classification_report, accuracy_score
 import matplotlib.pyplot as plt
 import warnings
@@ -45,6 +46,11 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.80, rando
 
 # Standardizing
 X_train, X_test = model_setup.standardize(X_train, X_test)
+
+# PCA
+pca = PCA(n_components=20)
+X_train = pca.fit_transform(X_train)
+X_test = pca.transform(X_test)
 
 # One-hot encoding
 num_classes = 4
