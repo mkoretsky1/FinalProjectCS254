@@ -78,6 +78,3 @@ def log_reg():
     log_reg_cv = RandomizedSearchCV(estimator=log_reg, param_distributions=params, n_iter=5, scoring='f1_weighted')
     return log_reg_cv
     
-    
-    
-    
