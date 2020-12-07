@@ -73,6 +73,3 @@ def log_reg():
                                    scoring='f1_weighted')
     return log_reg
     
-    
-    
-    
