@@ -7,7 +7,8 @@ import matplotlib.pyplot as plt
 import model_setup
 from sklearn.metrics import plot_confusion_matrix
 from sklearn.metrics import accuracy_score, auc, confusion_matrix, classification_report
-from sklearn.multiclass import OneVsRestClassifier  
+from sklearn.multiclass import OneVsRestClassifier 
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier 
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -29,8 +30,8 @@ X = pd.DataFrame(X_train)
 
 
 # Getting model - makes this easy to switch out
-model = model_setup.gradient_boosting()
-model_name = 'GBC' # good for plotting
+model = model_setup.random_forest()
+model_name = 'RF' # good for plotting
 
 # Fitting model
 model.fit(X_train, y_train)
