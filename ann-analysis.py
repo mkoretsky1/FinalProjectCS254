@@ -47,11 +47,6 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.80, rando
 # Standardizing
 X_train, X_test = model_setup.standardize(X_train, X_test)
 
-# PCA
-pca = PCA(n_components=20)
-X_train = pca.fit_transform(X_train)
-X_test = pca.transform(X_test)
-
 # One-hot encoding
 num_classes = 4
 y_train = to_categorical(y_train, num_classes)
@@ -68,13 +63,15 @@ print(y_test[0])
 
 # MLP model
 model = Sequential()
-model.add(layers.LeakyReLU(32, input_shape=(471,)))
-model.add(layers.Dense(4, activation='softmax'))
-opt = optimizers.SGD(learning_rate=0.001, momentum=0.5)
-#opt = optimizers.Adagrad(learning_rate=0.001)
-#opt = optimizers.RMSprop(learning_rate=0.0001, momentum=0.9, centered=True)
-#opt = optimizers.Adam(learning_rate=0.001)
-model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy','Precision','Recall'])
+#model.add(layers.LeakyReLU(32, input_shape=(471,)))
+model.add(layers.Dense(100, input_shape=(471,), activation='tanh'))
+#model.add(layers.LeakyReLU())
+#model.add(layers.LeakyReLU())
+#model.add(layers.Dense(100, activation='relu'))
+model.add(layers.Dense(3, activation='softmax'))
+#opt = optimizers.SGD(learning_rate=0.001, momentum=0.5)
+#opt = optimizers.RMSprop(learning_rate=0.001)
+model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy','Precision','Recall'])
 hist = model.fit(X_train, y_train, epochs=10, validation_split=0.2, batch_size=100)
 loss, accuracy, precision, recall = model.evaluate(X_test, y_test)
 f1 = 2*((precision*recall)/(precision+recall))
