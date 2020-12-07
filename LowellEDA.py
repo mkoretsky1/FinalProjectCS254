@@ -6,6 +6,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import model_setup
 from sklearn.decomposition import PCA
+from scipy.stats import mode
 
 #load in the data
 nypd = model_setup.set_up()
@@ -14,22 +15,56 @@ print(len(nypd))
 # Getting rid of Staten Island
 nypd_no_stat = nypd[nypd.BORO_NM != 'STATEN ISLAND']
 
+X = nypd_no_stat[["LAW_CAT_CD", "LOC_OF_OCCUR_DESC", "SUSP_AGE_GROUP", "VIC_AGE_GROUP", "VIC_RACE", "attempted_completed"]].values
+
 # Splitting data
 X_train, X_test, y_train, y_test = model_setup.split_data(nypd)
 
 # Standardizing data
 X_train, X_test = model_setup.standardize(X_train, X_test)
 
+
+
 #We can see here the count of non null values for each feature
 print(nypd.info())
 
-#here we can see the name of the columns
-print(nypd.columns)
+#trying to find the most recurrence
+print("Most frequent value in the above array:")
+print(mode(X, axis=0))
 
+
+max_overlap = nypd_no_stat.loc[(nypd_no_stat["LAW_CAT_CD"] == 1) & (nypd_no_stat["LOC_OF_OCCUR_DESC"] == 1) & (nypd_no_stat["SUSP_AGE_GROUP"] == 0) & (nypd["VIC_AGE_GROUP"] == 3) & (nypd["VIC_RACE"] == 0) & (nypd["attempted_completed"]== 1)]
+
+print(max_overlap.shape)
+
+bronx_dist = max_overlap[max_overlap.BORO_NM == "BRONX"].shape[0]
+
+queens_dist = max_overlap[max_overlap.BORO_NM == "QUEENS"].shape[0]
+
+brooklyn_dist = max_overlap[max_overlap.BORO_NM == "BROOKLYN"].shape[0]
+
+manhattan_dist = max_overlap[max_overlap.BORO_NM == "MANHATTAN"].shape[0]
+
+print(brooklyn_dist)
+print(queens_dist)
+print(bronx_dist)
+print(manhattan_dist)
+x = ['Bronx', 'Queens', 'Brooklyn', 'Manhattan']
+x_pos = [i for i, _ in enumerate(x)]
+nyc_dist = [bronx_dist, queens_dist, brooklyn_dist, manhattan_dist]
+
+plt.bar(x_pos, nyc_dist, color='green')
+plt.xticks(x_pos, x)
+plt.ylabel('Crime Count')
+plt.xlabel("New York City Borough")
+plt.title('Misdemeanor, Inside Location, Unknown Suspect Age, 45-63 Victim Age, Unknown Victim Race, Crime Completed')
+
+plt.show()
 #lets try looking at the split of the boros with PCA
 #transform the data to two components
-clf = PCA(n_components=2)
-transformed_data = clf.fit_transform(X_train)
+#clf = PCA(n_components=2)
+#transformed_data = clf.fit_transform(X_train)
+
 
 # #create a scatter plot with different colors for different clases of data-points
 # class_0 = np.where(y_train == "BRONX")
@@ -78,12 +113,12 @@ transformed_data = clf.fit_transform(X_train)
 #     label='manhattan')
 #
 # plt.ylabel('Count')
-# plt.title('Suspect Race by Borough')
+# plt.title('Victim Race by Borough')
 #
 # plt.xticks(ind + width / 2, ('UNKNOWN', 'ASIAN / PACIFIC ISLANDER', 'BLACK', 'BLACK HISPANIC', 'WHITE', 'WHITE HISPANIC'))
 # plt.legend(loc='best')
 # plt.show()
-#
+
 # #bar plot of the distribution of boroughs
 #
 #
@@ -113,30 +148,30 @@ transformed_data = clf.fit_transform(X_train)
 #
 # #bar plot of the distributions of important crime features by borough
 #
-#BRONX
-bronx_dist =nypd[nypd.BORO_NM == "BRONX"]["off_DANGEROUS DRUGS"].sum()
-
-queens_dist = nypd[nypd.BORO_NM == "QUEENS"]["off_DANGEROUS DRUGS"].sum()
-
-brooklyn_dist = nypd[nypd.BORO_NM == "BROOKLYN"]["off_DANGEROUS DRUGS"].sum()
-
-manhattan_dist = nypd[nypd.BORO_NM == "MANHATTAN"]["off_DANGEROUS DRUGS"].sum()
-
-print(brooklyn_dist)
-print(queens_dist)
-print(bronx_dist)
-print(manhattan_dist)
-x = ['Bronx', 'Queens', 'Brooklyn', 'Manhattan']
-x_pos = [i for i, _ in enumerate(x)]
-nyc_dist = [bronx_dist, queens_dist, brooklyn_dist, manhattan_dist]
-
-plt.bar(x_pos, nyc_dist, color='green')
-plt.xticks(x_pos, x)
-plt.ylabel('Crime Count')
-plt.xlabel("New York City Borough")
-plt.title('Bronx Important Feature: Weapon Possession Calls')
-
-plt.show()
+# #BRONX
+# bronx_dist =nypd[nypd.BORO_NM == "BRONX"]["off_DANGEROUS DRUGS"].sum()
+#
+# queens_dist = nypd[nypd.BORO_NM == "QUEENS"]["off_DANGEROUS DRUGS"].sum()
+#
+# brooklyn_dist = nypd[nypd.BORO_NM == "BROOKLYN"]["off_DANGEROUS DRUGS"].sum()
+#
+# manhattan_dist = nypd[nypd.BORO_NM == "MANHATTAN"]["off_DANGEROUS DRUGS"].sum()
+#
+# print(brooklyn_dist)
+# print(queens_dist)
+# print(bronx_dist)
+# print(manhattan_dist)
+# x = ['Bronx', 'Queens', 'Brooklyn', 'Manhattan']
+# x_pos = [i for i, _ in enumerate(x)]
+# nyc_dist = [bronx_dist, queens_dist, brooklyn_dist, manhattan_dist]
+#
+# plt.bar(x_pos, nyc_dist, color='green')
+# plt.xticks(x_pos, x)
+# plt.ylabel('Crime Count')
+# plt.xlabel("New York City Borough")
+# plt.title('Bronx Important Feature: Weapon Possession Calls')
+#
+# plt.show()
 #
 # #BROOKLYN
 #
