@@ -7,16 +7,19 @@ import matplotlib.pyplot as plt
 import model_setup
 from sklearn.metrics import plot_confusion_matrix
 from sklearn.metrics import accuracy_score, auc, confusion_matrix, classification_report
-from sklearn.multiclass import OneVsRestClassifier  
+from sklearn.multiclass import OneVsRestClassifier 
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier 
+import warnings
+warnings.filterwarnings("ignore")
 
 ### Main ###
 # Setting up model
 nypd = model_setup.set_up()
 print(len(nypd))
 
-# Dropping Staten Island (separate df for easy use)
-nypd_no_staten = nypd[nypd.BORO_NM != 'STATEN ISLAND']
-print(len(nypd_no_staten))
+# Dropping Staten Island
+nypd = nypd[nypd.BORO_NM != 'STATEN ISLAND']
+print(len(nypd))
 
 # Splitting and standardizing data
 X_train, X_test, y_train, y_test = model_setup.split_data(nypd)
@@ -28,7 +31,7 @@ X = pd.DataFrame(X_train)
 
 # Getting model - makes this easy to switch out
 model = model_setup.random_forest()
-model_name = 'Random Forest' # good for plotting
+model_name = 'RF' # good for plotting
 
 # Fitting model
 model.fit(X_train, y_train)
@@ -61,7 +64,7 @@ for i in range(len(ovr.estimators_)):
 for i in range(len(ovr.estimators_)):
     feature_importances = pd.DataFrame(ovr.estimators_[i].best_estimator_.feature_importances_, index=colnames,
                                           columns=["importance"]).sort_values('importance', ascending = False)
-    
+    figure_name = 'figures/' + model_name + '_feature_importance_' + ovr.classes_[i] + '.png'
     print(model_name + ' Feature Importances for ' + ovr.classes_[i])
     print(feature_importances.head(10))
     plt.barh(feature_importances.head(10).index, feature_importances.head(10)['importance'])
@@ -69,4 +72,5 @@ for i in range(len(ovr.estimators_)):
     plt.grid(True, which='major', axis='both')
     plt.title(model_name + ' Feature Importance for ' + ovr.classes_[i])
     plt.xlabel('importance')
+    #plt.savefig(figure_name)
     plt.show()
