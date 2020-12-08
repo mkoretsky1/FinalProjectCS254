@@ -17,6 +17,24 @@ import matplotlib.pyplot as plt
 import warnings
 warnings.filterwarnings("ignore")
 
+### Functions ###
+def recall_m(y_true, y_pred):
+    true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+    possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
+    recall = true_positives / (possible_positives + K.epsilon())
+    return recall
+
+def precision_m(y_true, y_pred):
+    true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+    predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
+    precision = true_positives / (predicted_positives + K.epsilon())
+    return precision
+
+def f1_m(y_true, y_pred):
+    precision = precision_m(y_true, y_pred)
+    recall = recall_m(y_true, y_pred)
+    return 2*((precision*recall)/(precision+recall+K.epsilon()))
+
 def plot_learning_curve(history):
     plt.plot(history.history['loss'])
     plt.plot(history.history['val_loss'])
@@ -61,19 +79,33 @@ print(X_test.shape)
 print(y_test.shape)
 print(y_test[0])
 
-# MLP model
+# MLP model #1
 model = Sequential()
-model.add(layers.LeakyReLU(32, input_shape=(471,)))
-#model.add(layers.Dense(100, input_shape=(471,), activation='tanh'))
-model.add(layers.LeakyReLU(64))
+model.add(layers.Dense(100, input_shape=(539,), activation='tanh'))
 model.add(layers.LeakyReLU())
-#model.add(layers.Dense(100, activation='relu'))
+model.add(layers.LeakyReLU())
+model.add(layers.LeakyReLU())
+model.add(layers.LeakyReLU())
+model.add(layers.LeakyReLU())
+model.add(layers.LeakyReLU())
+model.add(layers.Dense(100, activation='relu'))
 model.add(layers.Dense(4, activation='softmax'))
-opt = optimizers.SGD(learning_rate=0.001)
-#opt = optimizers.RMSprop(learning_rate=0.001)
-model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy','Precision','Recall'])
-hist = model.fit(X_train, y_train, epochs=10, validation_split=0.2, batch_size=100)
-loss, accuracy, precision, recall = model.evaluate(X_test, y_test)
-f1 = 2*((precision*recall)/(precision+recall))
-print(f1)
-plot_learning_curve(hist)
+opt = optimizers.SGD(learning_rate=0.01)
+model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy',f1_m,precision_m, recall_m])
+history = model.fit(X_train, y_train, validation_split=0.3, epochs=10, verbose=0)
+loss, accuracy, f1_score, precision, recall = model.evaluate(X_test, y_test, verbose=0)
+print(f1_score)
+plot_learning_curve(history)
+
+# # MLP model #2 
+# model = Sequential()
+# model.add(layers.LeakyReLU(32, input_shape=(471,)))
+# model.add(layers.LeakyReLU(64))
+# model.add(layers.LeakyReLU())
+# model.add(layers.Dense(4, activation='softmax'))
+# model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy','Precision','Recall'])
+# hist = model.fit(X_train, y_train, epochs=10, validation_split=0.2, batch_size=100)
+# loss, accuracy, precision, recall = model.evaluate(X_test, y_test)
+# f1 = 2*((precision*recall)/(precision+recall))
+# print(f1)
+# plot_learning_curve(hist)
